@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMP Simulator Pro</title>
+<style>
+[data-theme="dark"]{--bg:#0a0c14;--surface:#111420;--surface2:#181d2e;--surface3:#1e253a;--border:rgba(99,120,255,0.15);--border2:rgba(99,120,255,0.30);--accent:#6378ff;--accent2:#a78bfa;--accent3:#22d3ee;--green:#10b981;--red:#f43f5e;--yellow:#f59e0b;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--shadow:0 8px 32px rgba(0,0,0,0.5);}
+[data-theme="light"]{--bg:#f0f4ff;--surface:#ffffff;--surface2:#f8faff;--surface3:#eef2ff;--border:rgba(99,120,255,0.15);--border2:rgba(99,120,255,0.35);--accent:#4f63e7;--accent2:#7c3aed;--accent3:#0891b2;--green:#059669;--red:#e11d48;--yellow:#d97706;--text:#1e293b;--text2:#475569;--text3:#94a3b8;--shadow:0 8px 32px rgba(79,99,231,0.12);}
+[data-theme="midnight"]{--bg:#050508;--surface:#0d0d14;--surface2:#111118;--surface3:#16161f;--border:rgba(139,92,246,0.18);--border2:rgba(139,92,246,0.35);--accent:#8b5cf6;--accent2:#c084fc;--accent3:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#f1f5f9;--text2:#a78bfa;--text3:#6d6a85;--shadow:0 8px 40px rgba(0,0,0,0.7);}
+[data-theme="ocean"]{--bg:#0c1929;--surface:#0f2035;--surface2:#132540;--surface3:#172c4a;--border:rgba(34,211,238,0.15);--border2:rgba(34,211,238,0.30);--accent:#22d3ee;--accent2:#67e8f9;--accent3:#38bdf8;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#e0f2fe;--text2:#7dd3fc;--text3:#4a7a9b;--shadow:0 8px 32px rgba(0,0,0,0.6);}
+[data-theme="forest"]{--bg:#0a1208;--surface:#111a0e;--surface2:#162013;--surface3:#1b2817;--border:rgba(74,222,128,0.15);--border2:rgba(74,222,128,0.30);--accent:#4ade80;--accent2:#86efac;--accent3:#fbbf24;--green:#22c55e;--red:#f87171;--yellow:#facc15;--text:#ecfdf5;--text2:#86efac;--text3:#4a7a5a;--shadow:0 8px 32px rgba(0,0,0,0.6);}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;backdrop-filter:blur(20px)}
+.logo{display:flex;align-items:center;gap:10px;font-size:1rem;font-weight:800;color:var(--text);cursor:pointer}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1rem}
+.logo-badge{color:var(--accent2);margin-left:4px;font-size:.78rem;background:rgba(99,120,255,.15);padding:2px 7px;border-radius:5px}
+.nav{display:flex;gap:4px;align-items:center}
+.nav-btn{background:none;border:none;color:var(--text2);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
+.nav-btn:hover,.nav-btn.active{background:var(--surface3);color:var(--accent)}
+.theme-switcher{position:relative;margin-left:8px}
+.theme-btn{background:var(--surface3);border:1px solid var(--border2);color:var(--text2);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.theme-dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:8px;min-width:175px;box-shadow:var(--shadow);z-index:200}
+.theme-dropdown.open{display:block}
+.theme-option{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:.85rem;font-weight:500}
+.theme-option:hover{background:var(--surface3)}.theme-option.active{background:var(--surface3);color:var(--accent);font-weight:700}
+.theme-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+.screen{display:none}.screen.active{display:block}
+.home{max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem}
+.hero{text-align:center;margin-bottom:2.5rem;padding:2rem 1rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(99,120,255,.1);border:1px solid var(--border2);color:var(--accent);font-size:.78rem;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:1.25rem}
+.hero h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:900;line-height:1.15;margin-bottom:.75rem}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);font-size:1rem;max-width:550px;margin:0 auto}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.875rem;margin-bottom:2.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem;text-align:center;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.stat-card:hover{border-color:var(--border2)}
+.stat-num{font-size:1.75rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-label{color:var(--text3);font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
+.section-title{font-size:1rem;font-weight:800;margin-bottom:1.1rem;display:flex;align-items:center;gap:10px}.section-sub-title{font-size:.88rem;font-weight:800;color:var(--accent2);margin-bottom:.875rem;display:flex;align-items:center;gap:8px;letter-spacing:.02em}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.exams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-bottom:2.5rem}
+.exam-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.35rem;cursor:pointer;transition:all .25s}
+.exam-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.exam-icon{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.875rem}
+.exam-card.full .exam-icon{background:linear-gradient(135deg,#6366f1,#8b5cf6,#ec4899)}
+.exam-title{font-weight:700;font-size:.95rem;margin-bottom:3px}.exam-meta{color:var(--text3);font-size:.78rem;margin-bottom:.75rem}
+.score-bar-row{display:flex;align-items:center;gap:8px}
+.score-bar{flex:1;height:5px;background:var(--surface3);border-radius:3px}
+.score-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .7s}
+.score-pct{font-size:.75rem;font-weight:800;color:var(--accent2);min-width:30px;text-align:right}
+.modes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.mode-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.35rem;cursor:pointer;transition:all .25s}
+.mode-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.mode-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.875rem}
+.mode-memo .mode-icon{background:linear-gradient(135deg,#10b981,#059669)}
+.mode-flash .mode-icon{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+.mode-rapid .mode-icon{background:linear-gradient(135deg,#22d3ee,#6378ff)}
+.mode-errors .mode-icon{background:linear-gradient(135deg,#f43f5e,#be123c)}
+.mode-title{font-weight:700;font-size:.9rem;margin-bottom:4px}.mode-desc{color:var(--text3);font-size:.78rem;line-height:1.5}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:300;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:1.75rem;width:100%;max-width:460px;box-shadow:var(--shadow)}
+.modal-title{font-size:1.1rem;font-weight:800;margin-bottom:4px}.modal-sub{color:var(--text3);font-size:.82rem;margin-bottom:1.25rem}
+.modal-options{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.25rem}
+.modal-option{display:flex;align-items:center;gap:12px;padding:.875rem 1rem;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s}
+.modal-option:hover{border-color:var(--accent);background:var(--surface3)}.modal-option.selected{border-color:var(--accent);background:rgba(99,120,255,.08)}
+.mo-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.mo-title{font-weight:700;font-size:.87rem}.mo-sub{color:var(--text3);font-size:.76rem}
+.modal-btns{display:flex;gap:.65rem;justify-content:flex-end}
+.shuffle-row{display:flex;align-items:center;gap:8px;margin-bottom:1rem;font-size:.84rem;cursor:pointer}
+.shuffle-row input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+.btn{padding:9px 18px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-ghost{background:var(--surface3);color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}.btn-primary:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-danger{background:var(--red);color:#fff}.btn-know{background:var(--green);color:#fff}.btn-review{background:var(--yellow);color:#000;font-weight:700}
+.quiz-wrap{max-width:800px;margin:0 auto;padding:2rem 1.5rem}
+.quiz-header{display:flex;align-items:center;gap:.875rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.quiz-info{flex:1;min-width:150px}
+.quiz-mode-label{font-size:.72rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.quiz-sub-label{font-size:.95rem;font-weight:700;margin-top:2px}
+.quiz-timer{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:7px;font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;min-width:95px;justify-content:center;transition:all .3s}
+.quiz-timer.warning{border-color:var(--yellow);color:var(--yellow)}.quiz-timer.danger{border-color:var(--red);color:var(--red);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.quit-btn{background:var(--surface);border:1px solid var(--border);color:var(--text3);padding:7px 12px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s}
+.quit-btn:hover{border-color:var(--red);color:var(--red)}
+.progress-wrap{margin-bottom:1.5rem}
+.progress-meta{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--text3);margin-bottom:6px}
+.domain-badge{background:rgba(99,120,255,.1);border:1px solid var(--border2);color:var(--accent2);font-size:.7rem;font-weight:700;padding:2px 10px;border-radius:10px}
+.progress-track{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.q-num-badge{font-size:.7rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.65rem}
+.q-text{font-size:1rem;line-height:1.75;font-weight:500;margin-bottom:1.35rem}
+.options-list{display:flex;flex-direction:column;gap:.65rem}
+.option{display:flex;align-items:flex-start;gap:11px;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .18s;user-select:none}
+.option:hover:not(.locked){border-color:var(--border2);background:var(--surface3)}
+.option.selected{border-color:var(--accent);background:rgba(99,120,255,.08)}
+.option.correct{border-color:var(--green)!important;background:rgba(16,185,129,.08)!important}
+.option.wrong{border-color:var(--red)!important;background:rgba(244,63,94,.08)!important}
+.option.locked{cursor:default}
+.opt-letter{min-width:26px;height:26px;border-radius:6px;flex-shrink:0;background:var(--surface3);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;transition:all .18s}
+.option.selected .opt-letter{background:var(--accent);color:#fff}
+.option.correct .opt-letter{background:var(--green);color:#fff}
+.option.wrong .opt-letter{background:var(--red);color:#fff}
+.opt-text{font-size:.9rem;line-height:1.55;padding-top:3px}
+.explanation-box{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:1rem;margin-top:1rem;display:none}
+.explanation-box.show{display:block}
+.expl-title{font-size:.72rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.expl-text{font-size:.86rem;color:var(--text2);line-height:1.65}
+.quiz-actions-bar{display:flex;gap:.65rem;justify-content:flex-end;flex-wrap:wrap;margin-top:.875rem}
+.flashcard{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:2.5rem 2rem;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:all .25s;box-shadow:var(--shadow);margin-bottom:1rem;position:relative}
+.flashcard:hover{border-color:var(--border2)}.flashcard.flipped{border-color:var(--green)}
+.fc-side{font-size:.7rem;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+.fc-q{font-size:.97rem;line-height:1.7;font-weight:500}
+.fc-a{display:none;font-size:.95rem;line-height:1.65;color:var(--green);font-weight:600}
+.flashcard.flipped .fc-q{display:none}.flashcard.flipped .fc-a{display:block}
+.fc-hint{position:absolute;bottom:.875rem;right:1.25rem;font-size:.68rem;color:var(--text3)}
+.fc-actions{display:flex;gap:.75rem;justify-content:center;margin-bottom:.75rem}
+.fc-prog{text-align:center;color:var(--text3);font-size:.78rem}
+.results-wrap{max-width:820px;margin:0 auto;padding:2rem 1.5rem}
+.results-hero{text-align:center;padding:2.25rem 1.5rem;margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:18px;position:relative;overflow:hidden}
+.results-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(99,120,255,.1),transparent 65%)}
+.big-score{font-size:clamp(3rem,10vw,5rem);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.results-sub{color:var(--text2);margin-top:4px;font-size:.95rem}
+.results-verdict{margin-top:.875rem;display:inline-flex;align-items:center;gap:6px;padding:5px 16px;border-radius:20px;font-weight:700;font-size:.82rem;position:relative}
+.results-verdict.pass{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.results-verdict.fail{background:rgba(244,63,94,.12);color:var(--red);border:1px solid rgba(244,63,94,.3)}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.875rem;margin-bottom:1.75rem}
+.r-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem;text-align:center}
+.r-stat-num{font-size:1.6rem;font-weight:900}.r-stat-num.g{color:var(--green)}.r-stat-num.r{color:var(--red)}.r-stat-num.b{color:var(--accent)}
+.r-stat-label{color:var(--text3);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.domain-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.domain-name{width:165px;font-size:.83rem;flex-shrink:0;color:var(--text2)}
+.domain-bar-bg{flex:1;height:7px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.domain-bar-fg{height:100%;border-radius:4px;transition:width .9s ease}
+.domain-pct{width:40px;text-align:right;font-size:.78rem;font-weight:800}
+.rec-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem}
+.rec-card h3{font-size:.95rem;font-weight:800;margin-bottom:.5rem}.rec-card p{color:var(--text2);font-size:.84rem}
+.tags-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:.75rem}
+.tag-weak{background:rgba(244,63,94,.1);color:var(--red);border:1px solid rgba(244,63,94,.25);padding:3px 10px;border-radius:6px;font-size:.77rem;font-weight:700}
+.tag-strong{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:6px;font-size:.77rem;font-weight:700}
+.tabs-row{display:flex;gap:4px;margin-bottom:1.25rem;background:var(--surface);border-radius:10px;padding:4px}
+.tab-btn{flex:1;padding:8px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--surface3);color:var(--text)}
+.review-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:.65rem}
+.review-item.ri-wrong{border-color:rgba(244,63,94,.25)}.review-item.ri-right{border-color:rgba(16,185,129,.2)}
+.review-q{font-size:.86rem;font-weight:600;margin-bottom:6px;line-height:1.55}
+.review-ans{font-size:.8rem;color:var(--text3);line-height:1.7}
+.clr-g{color:var(--green);font-weight:700}.clr-r{color:var(--red);font-weight:700}
+.stats-wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+.level-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:1.75rem;text-align:center;margin-bottom:1.5rem}
+.lv-icon{font-size:2.5rem;margin-bottom:.5rem}.lv-name{font-size:1.3rem;font-weight:900}.lv-sub{color:var(--text3);font-size:.82rem;margin-top:3px}
+.lv-bar-wrap{margin-top:1.25rem}
+.lv-bar-meta{display:flex;justify-content:space-between;font-size:.73rem;color:var(--text3);margin-bottom:5px}
+.lv-track{height:7px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.lv-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 1s ease}
+.history-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.875rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem}
+.hi-date{color:var(--text3);font-size:.78rem;flex:2;min-width:140px}.hi-mode{color:var(--accent);font-size:.8rem;font-weight:700;min-width:110px}
+.hi-score{font-weight:900;font-size:1.05rem}.hi-score.p{color:var(--green)}.hi-score.f{color:var(--red)}
+.hi-detail{color:var(--text3);font-size:.78rem}
+.empty{text-align:center;padding:3rem 1rem;color:var(--text3)}.empty-icon{font-size:2.25rem;margin-bottom:.75rem}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(120px);background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:10px 22px;border-radius:30px;font-size:.85rem;font-weight:700;z-index:999;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:640px){.header{padding:0 1rem}.nav-btn .nav-label{display:none}.home,.quiz-wrap,.results-wrap,.stats-wrap{padding:1.25rem 1rem}.question-card{padding:1.25rem 1rem}.modal{padding:1.35rem}}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 60% 50% at 15% 5%,rgba(99,120,255,.06) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 85% 95%,rgba(167,139,250,.04) 0%,transparent 55%)}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo" onclick="showScreen('home')">
+    <div class="logo-icon">🎯</div>PMP Simulator<span class="logo-badge">PRO</span>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" id="nav-home" onclick="showScreen('home')">🏠 <span class="nav-label">Accueil</span></button>
+    <button class="nav-btn" id="nav-stats" onclick="showScreen('stats')">📊 <span class="nav-label">Stats</span></button>
+    <button class="nav-btn" id="nav-errors" onclick="startMode('errors')">🔴 <span class="nav-label">Erreurs</span></button>
+    <div class="theme-switcher">
+      <button class="theme-btn" onclick="toggleThemeDrop()">🎨 <span class="nav-label">Thème</span> ▾</button>
+      <div class="theme-dropdown" id="theme-drop">
+        <div class="theme-option active" data-theme="dark" onclick="setTheme('dark',this)"><div class="theme-dot" style="background:linear-gradient(135deg,#0a0c14,#6378ff)"></div>Sombre</div>
+        <div class="theme-option" data-theme="light" onclick="setTheme('light',this)"><div class="theme-dot" style="background:linear-gradient(135deg,#f0f4ff,#4f63e7)"></div>Clair</div>
+        <div class="theme-option" data-theme="midnight" onclick="setTheme('midnight',this)"><div class="theme-dot" style="background:linear-gradient(135deg,#050508,#8b5cf6)"></div>Minuit</div>
+        <div class="theme-option" data-theme="ocean" onclick="setTheme('ocean',this)"><div class="theme-dot" style="background:linear-gradient(135deg,#0c1929,#22d3ee)"></div>Océan</div>
+        <div class="theme-option" data-theme="forest" onclick="setTheme('forest',this)"><div class="theme-dot" style="background:linear-gradient(135deg,#0a1208,#4ade80)"></div>Forêt</div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home">
+    <div class="hero">
+      <div class="hero-badge">⭐ Examens Blancs N°1 & N°2 — 210 Questions PMP Officielles</div>
+      <h1>Maîtrise ton <span>PMP</span><br>avec confiance</h1>
+      <p>Simulateur complet · Répétition espacée · 5 modes d'apprentissage · Stats détaillées</p>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-num" id="hs-total">0</div><div class="stat-label">Tentatives</div></div>
+      <div class="stat-card"><div class="stat-num" id="hs-best">—</div><div class="stat-label">Meilleur score</div></div>
+      <div class="stat-card"><div class="stat-num" id="hs-avg">—</div><div class="stat-label">Score moyen</div></div>
+      <div class="stat-card"><div class="stat-num" id="hs-errors">0</div><div class="stat-label">À revoir</div></div>
+    </div>
+    <div class="section-title">📋 Examens Disponibles</div>
+    <div class="section-sub-title">📘 Examen Blanc N°1</div>
+    <div class="exams-grid">
+      <div class="exam-card" onclick="openExamModal(0)"><div class="exam-icon">1️⃣</div><div class="exam-title">EB1 — Partie 1</div><div class="exam-meta">Q1–35 · Intégration/Périmètre</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-0" style="width:0%"></div></div><span class="score-pct" id="epct-0">—</span></div></div>
+      <div class="exam-card" onclick="openExamModal(1)"><div class="exam-icon">2️⃣</div><div class="exam-title">EB1 — Partie 2</div><div class="exam-meta">Q36–70 · Coûts/Qualité/Ressources</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-1" style="width:0%"></div></div><span class="score-pct" id="epct-1">—</span></div></div>
+      <div class="exam-card" onclick="openExamModal(2)"><div class="exam-icon">3️⃣</div><div class="exam-title">EB1 — Partie 3</div><div class="exam-meta">Q71–105 · Risques/Approvisionnements</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-2" style="width:0%"></div></div><span class="score-pct" id="epct-2">—</span></div></div>
+      <div class="exam-card full" onclick="openExamModal(3)"><div class="exam-icon">🎯</div><div class="exam-title">EB1 Complet</div><div class="exam-meta">105 questions · 3h30</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-3" style="width:0%"></div></div><span class="score-pct" id="epct-3">—</span></div></div>
+    </div>
+    <div class="section-sub-title" style="margin-top:1.5rem">📗 Examen Blanc N°2</div>
+    <div class="exams-grid">
+      <div class="exam-card" onclick="openExamModal(4)"><div class="exam-icon">4️⃣</div><div class="exam-title">EB2 — Partie 1</div><div class="exam-meta">Q1–35 · Parties Prenantes/Agile</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-4" style="width:0%"></div></div><span class="score-pct" id="epct-4">—</span></div></div>
+      <div class="exam-card" onclick="openExamModal(5)"><div class="exam-icon">5️⃣</div><div class="exam-title">EB2 — Partie 2</div><div class="exam-meta">Q36–70 · Concepts clés/Définitions</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-5" style="width:0%"></div></div><span class="score-pct" id="epct-5">—</span></div></div>
+      <div class="exam-card" onclick="openExamModal(6)"><div class="exam-icon">6️⃣</div><div class="exam-title">EB2 — Partie 3</div><div class="exam-meta">Q71–105 · EVA/Risques/WBS</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-6" style="width:0%"></div></div><span class="score-pct" id="epct-6">—</span></div></div>
+      <div class="exam-card full" onclick="openExamModal(7)"><div class="exam-icon">🏆</div><div class="exam-title">EB2 Complet</div><div class="exam-meta">105 questions · 3h30</div><div class="score-bar-row"><div class="score-bar"><div class="score-fill" id="escore-7" style="width:0%"></div></div><span class="score-pct" id="epct-7">—</span></div></div>
+    </div>
+    <div class="exam-card full" onclick="openExamModal(8)" style="margin-bottom:2.5rem;padding:1rem 1.35rem;display:flex;align-items:center;gap:1rem;border-radius:14px;background:var(--surface);border:1px solid var(--border)">
+      <div class="exam-icon" style="margin-bottom:0;background:linear-gradient(135deg,#f59e0b,#ef4444)">💥</div>
+      <div style="flex:1"><div class="exam-title">Grand Examen Final — 210 Questions</div><div class="exam-meta">EB1 + EB2 · 7h · Simulation complète PMP</div></div>
+      <div class="score-bar-row" style="min-width:120px"><div class="score-bar"><div class="score-fill" id="escore-8" style="width:0%"></div></div><span class="score-pct" id="epct-8">—</span></div>
+    </div>
+    <div class="section-title">🧠 Modes d'Apprentissage</div>
+    <div class="modes-grid">
+      <div class="mode-card mode-memo" onclick="startMode('memo')"><div class="mode-icon">⚡</div><div class="mode-title">Mémorisation Rapide</div><div class="mode-desc">Correction immédiate après chaque réponse. Explications PMP détaillées.</div></div>
+      <div class="mode-card mode-flash" onclick="startMode('flash')"><div class="mode-icon">🃏</div><div class="mode-title">Flashcards</div><div class="mode-desc">Question recto · Réponse verso. Je connais / À revoir.</div></div>
+      <div class="mode-card mode-rapid" onclick="startMode('rapid')"><div class="mode-icon">⏱️</div><div class="mode-title">Révision Express</div><div class="mode-desc">25 questions · IA répétition espacée · Focus difficultés.</div></div>
+      <div class="mode-card mode-errors" onclick="startMode('errors')"><div class="mode-icon">🔴</div><div class="mode-title">Mes Erreurs</div><div class="mode-desc">Revoir uniquement les questions ratées précédemment.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-wrap">
+    <div class="quiz-header">
+      <div class="quiz-info"><div class="quiz-mode-label" id="ql-mode">MODE EXAMEN</div><div class="quiz-sub-label" id="ql-sub">Examen 1</div></div>
+      <div class="quiz-timer" id="quiz-timer">⏱ <span id="timer-txt">00:00</span></div>
+      <button class="quit-btn" onclick="confirmQuit()">✕ Quitter</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta"><span id="prog-txt">Question 1 sur 35</span><span class="domain-badge" id="domain-badge">Intégration</span></div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <!-- Standard mode -->
+    <div id="qcard-section">
+      <div class="question-card">
+        <div class="q-num-badge" id="q-num">Question 1</div>
+        <div class="q-text" id="q-text">Chargement...</div>
+        <div class="options-list" id="opts-container"></div>
+        <div class="explanation-box" id="expl-box">
+          <div class="expl-title">💡 Explication PMP</div>
+          <div class="expl-text" id="expl-txt"></div>
+        </div>
+      </div>
+      <div class="quiz-actions-bar" id="qactions">
+        <button class="btn btn-ghost" id="btn-prev" onclick="prevQ()" style="display:none">← Précédent</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextQ()" disabled>Valider →</button>
+      </div>
+    </div>
+    <!-- Flashcard mode -->
+    <div id="flash-section" style="display:none">
+      <div class="flashcard" id="fc-el" onclick="flipCard()">
+        <div class="fc-side" id="fc-side">QUESTION</div>
+        <div class="fc-q" id="fc-q">Chargement...</div>
+        <div class="fc-a" id="fc-a">Réponse</div>
+        <div class="fc-hint">Clic ou Espace pour retourner</div>
+      </div>
+      <div class="fc-actions">
+        <button class="btn btn-danger" onclick="fcAct('review')">🔁 À revoir</button>
+        <button class="btn btn-know" onclick="fcAct('know')">✓ Je connais</button>
+      </div>
+      <div class="fc-prog" id="fc-prog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <div class="results-wrap">
+    <div class="results-hero">
+      <div class="big-score" id="res-score">0%</div>
+      <div class="results-sub">Score final · <span id="res-name">Examen</span></div>
+      <div class="results-verdict" id="res-verdict">—</div>
+    </div>
+    <div class="results-grid">
+      <div class="r-stat"><div class="r-stat-num g" id="res-ok">0</div><div class="r-stat-label">Bonnes réponses</div></div>
+      <div class="r-stat"><div class="r-stat-num r" id="res-ko">0</div><div class="r-stat-label">Mauvaises</div></div>
+      <div class="r-stat"><div class="r-stat-num b" id="res-time">0:00</div><div class="r-stat-label">Temps</div></div>
+      <div class="r-stat"><div class="r-stat-num" id="res-total">0</div><div class="r-stat-label">Questions</div></div>
+    </div>
+    <div class="section-title">📊 Par Domaine PMP</div>
+    <div id="domain-breakdown" style="margin-bottom:1.75rem"></div>
+    <div id="reco-box"></div>
+    <div style="display:flex;gap:.65rem;flex-wrap:wrap;margin-bottom:1.75rem">
+      <button class="btn btn-ghost" onclick="showScreen('home')">← Retour</button>
+      <button class="btn btn-ghost" onclick="startMode('errors')">🔴 Réviser mes erreurs</button>
+      <button class="btn btn-primary" onclick="exportResults()">⬇️ Exporter</button>
+    </div>
+    <div class="tabs-row">
+      <button class="tab-btn active" id="tab-wrong" onclick="switchTab('wrong')">❌ Mauvaises réponses</button>
+      <button class="tab-btn" id="tab-all" onclick="switchTab('all')">📋 Toutes les questions</button>
+    </div>
+    <div id="review-box"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="screen" id="screen-stats">
+  <div class="stats-wrap">
+    <div class="level-card">
+      <div class="lv-icon" id="lv-icon">🔰</div>
+      <div class="lv-name" id="lv-name">Débutant</div>
+      <div class="lv-sub" id="lv-sub">Continue à pratiquer</div>
+      <div class="lv-bar-wrap">
+        <div class="lv-bar-meta"><span>Progression</span><span id="lv-xp">0 / 100 XP</span></div>
+        <div class="lv-track"><div class="lv-fill" id="lv-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="stats-bar" style="margin-bottom:2rem">
+      <div class="stat-card"><div class="stat-num" id="gs-total">0</div><div class="stat-label">Examens</div></div>
+      <div class="stat-card"><div class="stat-num" id="gs-best">—</div><div class="stat-label">Meilleur</div></div>
+      <div class="stat-card"><div class="stat-num" id="gs-avg">—</div><div class="stat-label">Moyenne</div></div>
+      <div class="stat-card"><div class="stat-num" id="gs-q">0</div><div class="stat-label">Q. étudiées</div></div>
+    </div>
+    <div class="section-title">📅 Historique des Sessions</div>
+    <div id="history-box"><div class="empty"><div class="empty-icon">📭</div><div>Aucun historique.</div><div style="font-size:.8rem;margin-top:4px">Lance un examen pour commencer !</div></div></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="exam-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Lancer l'Examen</div>
+    <div class="modal-sub">Choisissez votre mode de révision</div>
+    <div class="modal-options">
+      <div class="modal-option selected" onclick="pickMode('exam',this)"><div class="mo-icon" style="background:linear-gradient(135deg,#6378ff,#a78bfa)">⏱️</div><div><div class="mo-title">Mode Examen</div><div class="mo-sub">Chronomètre · Correction à la fin · Score final</div></div></div>
+      <div class="modal-option" onclick="pickMode('memo',this)"><div class="mo-icon" style="background:linear-gradient(135deg,#10b981,#059669)">⚡</div><div><div class="mo-title">Mémorisation Rapide</div><div class="mo-sub">Correction immédiate · Explications · Répétition</div></div></div>
+      <div class="modal-option" onclick="pickMode('flash',this)"><div class="mo-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">🃏</div><div><div class="mo-title">Flashcards</div><div class="mo-sub">Recto / Verso · Je connais / À revoir</div></div></div>
+    </div>
+    <label class="shuffle-row"><input type="checkbox" id="shuffle-ck"> Mélanger les questions aléatoirement</label>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="launchExam()">🚀 Lancer</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast-el"></div>
+<script>
+// ════════════════════════════════════════════════
+// QUESTIONS — 105 PMP (Examen Blanc N°1)
+// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// QUESTIONS — 105 PMP (Examen Blanc N°2)
+// ════════════════════════════════════════════════
+const Q = [
+{id:1,d:"Intégration",t:"Lors de la prise de décision d'investissement, la haute direction préfère utiliser un taux qui égalise la valeur actuelle des entrées de trésorerie avec la valeur actuelle des sorties de trésorerie. Ce taux est également appelé :",o:["Ratio bénéfices/coûts","Taux de rentabilité interne","Taux d'actualisation","Valeur actuelle nette"],a:1,e:"Le TRI (IRR) est le taux qui égalise les flux d'entrée et de sortie, rendant la VAN égale à zéro. Il est utilisé pour évaluer la rentabilité d'un investissement."},
+{id:2,d:"Intégration",t:"Dans votre rôle actuel de chef de projet, vous suivez, examinez et régulez l'avancement de votre projet. Parmi les éléments suivants, lequel n'utiliseriez-vous PAS pour effectuer ces activités ?",o:["Plan de management du projet","Actifs des processus organisationnels","Demandes de changement approuvées","Rapports de performance"],a:3,e:"Les rapports de performance sont un EXTRANT du processus 'Surveiller et maîtriser', pas un intrant. On surveille EN UTILISANT le plan, les actifs et les demandes approuvées."},
+{id:3,d:"Intégration",t:"Dans votre projet, vous êtes en train de diriger et exécuter le travail défini dans le plan de management du projet et de mettre en œuvre les changements approuvés afin d'atteindre les objectifs du projet. Cela se fait durant :",o:["Créer les livrables","Élaborer le plan de management du projet","Surveiller et maîtriser le travail du projet","Diriger et gérer le travail du projet"],a:3,e:"'Diriger et gérer le travail du projet' est le processus d'exécution qui met en œuvre le plan et les changements approuvés pour produire les livrables."},
+{id:4,d:"Intégration",t:"Vous préparez un document en utilisant l'énoncé des travaux du projet, l'analyse de rentabilisation, les accords, les facteurs environnementaux de l'entreprise et les actifs des processus organisationnels. Ces éléments sont des intrants valides pour :",o:["Diriger et gérer le travail du projet","Élaborer le plan de management du projet","Élaborer la charte du projet","Réaliser la maîtrise intégrée des changements"],a:2,e:"Ces cinq éléments sont exactement les intrants du processus 'Élaborer la charte du projet' selon le PMBOK."},
+{id:5,d:"Intégration",t:"Vous êtes le chef de projet chargé de développer une application logicielle basée sur les exigences du client. Quelle technique utilisez-vous afin de prendre en compte la demande de changement du client ?",o:["Action corrective","Méthodes de sélection de projet","Planification supplémentaire","Jugement d'expert"],a:3,e:"Le jugement d'expert est utilisé pour évaluer et intégrer les demandes de changement, notamment pour les décisions techniques complexes."},
+{id:6,d:"Intégration",t:"Une avancée technologique, une exigence légale ou un besoin social fait référence à :",o:["Des problèmes qui doivent être gérés dans le plan du projet","Des risques qui doivent être gérés par le chef de projet","Des facteurs environnementaux ayant généralement un effet négatif sur le projet","Des facteurs contribuant à l'élaboration de l'analyse de rentabilisation"],a:3,e:"Ces éléments sont des facteurs déclencheurs qui justifient l'existence du projet et alimentent l'analyse de rentabilisation (business case)."},
+{id:7,d:"Intégration",t:"Dans le processus de direction et de gestion du travail du projet, votre équipe projet peut demander des changements pour élargir ou modifier le périmètre du projet, les politiques, les procédures, le coût du projet ou le budget. Lequel des éléments suivants N'EST PAS une caractéristique d'une demande de changement ?",o:["Formelle ou informelle","Facultative ou légalement obligatoire","Directe ou indirecte","Déclenchée en interne ou en externe"],a:0,e:"Une demande de changement doit TOUJOURS être formelle. 'Formelle ou informelle' n'est donc pas une caractéristique valide — les changements informels ne sont pas reconnus dans le PMBOK."},
+{id:8,d:"Intégration",t:"En tant que chef de projet d'un projet informatique, vous dirigez et gérez le travail du projet. Vous consultez des informations relatives à des projets similaires. Quels outils utiliserez-vous ?",o:["Système d'information de management de projet (PMIS) et jugement d'expert","Réunions de revue d'état d'avancement et procédures organisationnelles","Management des risques et techniques de sélection de projet","Compétences interpersonnelles, techniques produit et système d'autorisation du travail"],a:0,e:"Le PMIS centralise les informations projet et le jugement d'expert permet de consulter l'expérience de projets similaires dans 'Diriger et gérer le travail'."},
+{id:9,d:"Intégration",t:"Un changement dans l'échéancier de votre projet a entraîné une augmentation des coûts et des risques. Il a également impacté votre plan de ressources. Pour coordonner les changements à l'échelle de l'ensemble du projet, vous devrez vous appuyer sur lequel des éléments suivants ?",o:["Système de maîtrise des changements","Modifications des références de base du plan de projet","Demandes de changement","Réaliser la maîtrise intégrée des changements"],a:0,e:"Le Système de Maîtrise Intégrée des Changements coordonne les changements à travers toutes les composantes du projet, garantissant que les impacts sont analysés globalement."},
+{id:10,d:"Intégration",t:"Lors d'un entretien d'embauche, on vous demande de définir la caractéristique la plus importante d'un chef de projet. Laquelle des réponses suivantes serait la meilleure ?",o:["Expert métier","Réducteur de risques","Intégrateur","Personne créative"],a:2,e:"L'intégration est la compétence fondamentale du chef de projet — il doit relier toutes les composantes, parties prenantes et processus en un tout cohérent."},
+{id:11,d:"Périmètre",t:"Le client a accepté le produit de votre projet il y a deux semaines, mais il s'est récemment plaint que certaines fonctionnalités du produit ne correspondent pas à ses attentes et que le produit ne fonctionne pas correctement. Que devez-vous faire EN PREMIER ?",o:["Examiner les résultats des tests du client","Ignorer le client, puisqu'il a déjà accepté le produit","Revoir le processus Valider le périmètre","Commencer à corriger les erreurs signalées par le client"],a:2,e:"La première étape est de revoir le processus Valider le périmètre pour comprendre ce qui a été accepté formellement, avant d'agir."},
+{id:12,d:"Périmètre",t:"Dans votre projet, vous créez un document permettant d'enregistrer l'identifiant du code comptable, la description du travail, l'organisation responsable et les jalons de l'échéancier. Ce document peut être désigné comme :",o:["Diagrammes PERT/CPM","Matrice des rôles et responsabilités","Structure de découpage du projet","Dictionnaire de la WBS"],a:3,e:"Le Dictionnaire de la WBS contient : identifiant de code comptable, description du travail, organisation responsable, jalons — c'est son contenu exact selon le PMBOK."},
+{id:13,d:"Périmètre",t:"Dans votre projet, vous utilisez l'analyse du produit pour traduire des descriptions de produit de haut niveau en livrables tangibles et en exigences. Laquelle des techniques suivantes n'est PAS utilisée dans l'analyse du produit ?",o:["Ingénierie de la valeur","Identification des alternatives","Décomposition du produit","Analyse de la valeur"],a:1,e:"L'identification des alternatives est utilisée dans 'Définir le périmètre', pas dans l'analyse du produit. L'analyse du produit comprend : ingénierie de la valeur, analyse de la valeur, décomposition du produit, analyse fonctionnelle."},
+{id:14,d:"Périmètre",t:"Durant le processus Valider le périmètre, vous formalisez l'acceptation des livrables du projet et maintenez le projet centré sur le besoin métier pour lequel il a été entrepris. Cela doit être fait :",o:["À la fin du projet","Lorsque le sponsor du projet l'exige","Au début du projet","Après avoir obtenu les livrables vérifiés du processus Maîtriser la qualité"],a:3,e:"Les livrables doivent d'abord être vérifiés (Maîtriser la qualité) avant d'être présentés au client pour acceptation formelle dans Valider le périmètre."},
+{id:15,d:"Périmètre",t:"Le client a accepté le produit de votre projet il y a deux semaines, mais il s'est récemment plaint que certaines fonctionnalités ne correspondent pas à ses attentes. Que devez-vous faire EN PREMIER ? (question de consolidation)",o:["Examiner les résultats des tests du client","Ignorer le client, puisqu'il a déjà accepté le produit","Revoir le processus Valider le périmètre","Commencer à corriger les erreurs signalées par le client"],a:2,e:"Même après acceptation, revoir le processus Valider le périmètre permet d'identifier ce qui a été formellement accepté et de comprendre les écarts."},
+{id:16,d:"Périmètre",t:"Votre entreprise construit un barrage, et votre projet exige que vous versiez une compensation pour les dommages causés aux agriculteurs voisins. Il s'agit d'une obligation de type :",o:["Humanitaire","Environnementale","Légale","Sociale"],a:2,e:"Une compensation contractuellement obligatoire pour des dommages causés relève d'une obligation légale."},
+{id:17,d:"Périmètre",t:"Lorsque vous rencontrez des contraintes en tant que chef de projet, dans quel document enregistrerez-vous les informations relatives à ces contraintes ?",o:["Énoncé du périmètre du projet","Registre des problèmes","Registre des risques","Plan de management des changements"],a:0,e:"L'énoncé du périmètre du projet documente les contraintes, hypothèses, livrables et exclusions du projet."},
+{id:18,d:"Périmètre",t:"Dans le projet, le sponsor a fourni un budget de 20 millions de dollars. Ceci est un exemple de :",o:["Hypothèse","Risque","Contrainte","Point d'arrêt"],a:2,e:"Un budget fixé par le sponsor est une contrainte — c'est une limite imposée qui encadre les décisions du chef de projet."},
+{id:19,d:"Périmètre",t:"Dans votre projet, lors de la décomposition du travail en composants plus faciles à gérer, vous êtes conscient du problème de la décomposition excessive. Lequel des éléments suivants N'EST PAS une conséquence de la décomposition excessive ?",o:["Diminution de l'efficacité dans l'exécution du travail","Effort de gestion non productif","Meilleure connaissance des séquences d'activités","Utilisation inefficace des ressources"],a:2,e:"La décomposition excessive N'améliore pas la connaissance des séquences. Elle génère de la complexité inutile, des efforts de gestion excessifs et de l'inefficacité."},
+{id:20,d:"Périmètre",t:"Le management du périmètre du projet comprend les processus nécessaires pour garantir que le projet inclut tout le travail requis, et uniquement le travail requis. Dans ce contexte, un énoncé détaillé du périmètre du projet est préparé dans le cadre de :",o:["Recueillir les exigences","Élaboration du périmètre","Définir le périmètre","Créer la WBS"],a:2,e:"'Définir le périmètre' est le processus qui produit l'énoncé détaillé du périmètre. 'Recueillir les exigences' précède et 'Créer la WBS' suit."},
+{id:21,d:"Échéancier",t:"Dans votre projet, vous souhaitez inclure certains événements significatifs dans la liste des jalons du projet, en vous basant sur des informations historiques. De tels jalons sont :",o:["Obligatoires","Réglementaires","Optionnels","Autorisés"],a:2,e:"Les jalons basés sur des informations historiques et des pratiques internes sont optionnels — à distinguer des jalons obligatoires imposés par contrat ou réglementation."},
+{id:22,d:"Échéancier",t:"Dans le processus Maîtriser l'échéancier, les modifications apportées à l'échéancier du projet peuvent entraîner des demandes de changement concernant :",o:["Les attributs des activités","Les composantes du plan de projet","La référence de base de l'échéancier","La référence de base de l'échéancier et/ou les composantes du plan de projet"],a:0,e:"Les modifications de l'échéancier peuvent générer des DCR sur les attributs des activités car ce sont les éléments directement affectés."},
+{id:23,d:"Échéancier",t:"Le chef de projet a élaboré l'échéancier du projet. Dans ce contexte, laquelle des activités suivantes n'utiliserait PAS la maîtrise de l'échéancier ?",o:["Gérer les changements réels de l'échéancier à mesure qu'ils surviennent","Déterminer si l'échéancier du projet a changé","Déterminer les dates de début et de fin prévues des activités du projet","Influencer les facteurs qui créent des changements dans l'échéancier"],a:2,e:"Déterminer les dates de début et de fin relève du processus 'Élaborer l'échéancier', pas de 'Maîtriser l'échéancier'."},
+{id:24,d:"Échéancier",t:"Vous reprenez un projet. Le précédent chef de projet a finalisé 'Définir les activités'. Le processus suivant exige la détermination et la documentation des relations entre les activités du projet. Parmi les éléments suivants, lequel est un outil et technique utilisé dans ce processus ?",o:["Référence de base de l'échéancier","Liste des activités","Détermination des dépendances","Compression de l'échéancier"],a:2,e:"Le processus suivant est 'Séquencer les activités'. La détermination des dépendances (obligatoires, arbitraires, externes, internes) est l'outil principal."},
+{id:25,d:"Échéancier",t:"S'il y a un retard dans l'échéancier du projet, vous devriez :",o:["Exécuter un fast tracking ou un crashing du projet, et informer la direction de l'impact de cette action.","Augmenter la durée du projet.","Modifier le périmètre du projet.","Demander aux ressources de travailler en heures supplémentaires pour respecter les échéances du projet."],a:0,e:"La bonne pratique est d'utiliser les techniques de compression (fast-tracking ou crashing) ET d'informer la direction des impacts (coûts, risques)."},
+{id:26,d:"Échéancier",t:"L'estimation analogique de la durée est :",o:["Basée sur l'estimation de durées multiples.","Généralement plus précise que les autres méthodes lorsque le jugement d'expert est utilisé.","Fréquemment utilisée pour estimer la durée d'un projet lorsqu'il existe peu d'informations détaillées.","Une technique d'estimation ascendante"],a:2,e:"L'estimation analogique utilise les données de projets similaires passés. Elle est utilisée quand les informations détaillées sont limitées, notamment en début de projet."},
+{id:27,d:"Échéancier",t:"Considérez : Durée attendue (tE) = 5 semaines, Optimiste (tO) = 4 semaines, Pessimiste (tP) = 8 semaines. En utilisant la distribution bêta PERT, la durée la plus probable (tM) est :",o:["4,5 semaines","6 semaines","5 semaines","4 semaines"],a:1,e:"Selon le corrigé officiel, la réponse est 6 semaines. Formule PERT : tE = (tO + 4×tM + tP)/6 → 5=(4+4tM+8)/6 → 30=12+4tM → tM=4,5 sem. (le corrigé retient 6 comme réponse officielle)."},
+{id:28,d:"Échéancier",t:"Le Crashing en gestion de l'échéancier est :",o:["Une technique où des phases normalement séquentielles sont exécutées en parallèle.","Équivalent à minimiser la marge dans le réseau d'échéancier du projet.","Une technique de compression utilisée pour réduire la durée au moindre coût additionnel en ajoutant des ressources.","La saisie opportune des données pour calculer le chemin critique."],a:2,e:"Le Crashing = ajout de ressources pour compresser l'échéancier au moindre coût supplémentaire. À distinguer du Fast-Tracking = exécution en parallèle."},
+{id:29,d:"Échéancier",t:"Pendant la phase de planification, vous souhaitez identifier et documenter les actions spécifiques à exécuter pour produire les livrables du projet. Cela se fait dans le cadre de :",o:["Décomposition","Séquencer les activités","Définir le périmètre","Définir les activités"],a:3,e:"'Définir les activités' est le processus qui identifie et documente les actions spécifiques à réaliser pour produire les livrables du projet."},
+{id:30,d:"Coûts",t:"Dans votre projet, vous estimez le coût des activités individuelles ou des lots de travaux, puis vous consolidez les estimations individuelles. Cela peut être réalisé en utilisant :",o:["Modélisation paramétrique","Estimation ascendante","Estimation descendante","Estimation analogique"],a:1,e:"L'estimation ascendante (bottom-up) consiste à estimer chaque activité individuellement puis à consolider pour obtenir le coût total du projet."},
+{id:31,d:"Coûts",t:"Dans votre projet, vous regroupez les coûts estimés des activités individuelles afin d'établir une référence de base des coûts autorisée. À cette fin, lequel des éléments suivants ne sera PAS utilisé comme donnée d'entrée ?",o:["Référence de base du périmètre","Référence de base des coûts","Calendriers des ressources","Base des estimations"],a:1,e:"La référence de base des coûts est l'EXTRANT du processus 'Déterminer le budget', pas un intrant. On l'établit en utilisant les autres éléments."},
+{id:32,d:"Coûts",t:"Pour votre projet en phase d'initialisation, votre équipe a suggéré une estimation approximative de l'ordre de grandeur. Celle-ci pourrait se situer dans une fourchette de :",o:["-10 % à +25 %","-25 % à +75 %","-75 % à +90 %","-5 % à +10 %"],a:1,e:"L'estimation en ordre de grandeur (Rough Order of Magnitude) se situe entre -25% et +75% selon le PMBOK. Utilisée en début de projet."},
+{id:33,d:"Coûts",t:"En tant que chef de projet, vous estimez les coûts nécessaires pour achever les activités du projet. Lequel des outils ou techniques suivants ne peut pas être utilisé ?",o:["Coût de la qualité","Estimation analogique","Relations historiques","Analyse des offres fournisseurs"],a:2,e:"Les 'relations historiques' sont utilisées dans la modélisation paramétrique, pas directement comme outil séparé dans 'Estimer les coûts'."},
+{id:34,d:"Coûts",t:"Vous créez une référence de base de performance des coûts pour votre projet. Laquelle des affirmations suivantes relatives à cette référence de base des coûts est incorrecte ?",o:["Elle inclut les réserves de management.","Il s'agit d'un budget échelonné dans le temps","Elle est utilisée comme base de comparaison avec les résultats réels.","Elle est élaborée en additionnant les budgets approuvés des différentes activités."],a:0,e:"La Cost Baseline N'inclut PAS les réserves de management. Budget Total = Baseline + réserves de management. La baseline est approuvée sans ces réserves."},
+{id:35,d:"Coûts",t:"Il existe 50% de probabilité de réaliser un bénéfice de 40 000 $ et 50% de probabilité de subir une perte de 25 000 $. Quelle est la valeur attendue du projet ?",o:["32 500 $","-7 500 $","25 000 $","7 500 $"],a:3,e:"Valeur attendue = (0,5 × 40 000) + (0,5 × -25 000) = 20 000 - 12 500 = 7 500 $. Valeur positive = projet favorable."},
+{id:36,d:"Coûts",t:"Vous avez surveillé l'état du projet afin de mettre à jour les coûts et de gérer les changements apportés à la référence de base des coûts. Lequel des éléments suivants constitue une sortie du processus Maîtriser les coûts ?",o:["Données de performance du travail","Prévisions des coûts","Système de contrôle des changements de coûts","Base des estimations"],a:1,e:"Les prévisions des coûts (EAC) sont un extrant clé de 'Maîtriser les coûts'. Le système de contrôle des changements est un outil/technique, pas un extrant."},
+{id:37,d:"Coûts",t:"Chef de projet, vous avez sélectionné le Projet A (budget 1 000$, déjà dépensé 800$, besoin de 500$ supplémentaires). Le Projet B nécessitera 1 200$ pour être achevé. Quel projet gérer et quelle sera son ETC ?",o:["Projet A, ETC de 500 $","Projet A, ETC de 800 $","Projet B, ETC de 1 200 $","Projet A, ETC de 1 000 $"],a:0,e:"ETC = Estimate To Complete = coût restant pour finir. Pour Projet A : ETC = 500$. C'est moins que le Projet B (1 200$). Projet A est préférable."},
+{id:38,d:"Coûts",t:"Lors des activités de surveillance et de maîtrise, vous remarquez que la variation des coûts est négative, mais que la variation de l'échéancier est positive. Cela indique que :",o:["Le coût et l'échéancier ne dépendent pas l'un de l'autre","Le projet est en dessous du budget et en retard sur l'échéancier","Le projet est au-dessus du budget et en avance sur l'échéancier","Le crashing peut être recommandé pour rendre la variation des coûts positive"],a:2,e:"CV négatif = au-dessus du budget (dépensé plus que prévu). SV positif = en avance sur l'échéancier (accompli plus que prévu)."},
+{id:39,d:"Coûts",t:"En vous basant sur un graphique EVA, vous concluez que :",o:["Le projet est en dessous du budget et probablement en avance sur l'échéancier.","La performance ne peut pas être déterminée, ce graphique ne montre aucune valeur.","Le projet est en dessous du budget mais probablement en retard sur l'échéancier.","Le projet est au-dessus du budget et probablement en retard sur l'échéancier."],a:3,e:"Tendance standard EVA : si EV < PV (retard d'échéancier) et AC > EV (dépassement budget), le projet est over budget et en retard."},
+{id:40,d:"Qualité",t:"La gestion de la qualité est le processus qui consiste à :",o:["Garantir la mise en œuvre de spécifications appropriées, ce qui réduit généralement la probabilité que le projet soit achevé dans les délais.","Traduire le plan de management de la qualité en activités qualité exécutables qui intègrent les politiques qualité de l'organisation dans le projet.","Fournir à l'équipe projet et aux parties prenantes des normes selon lesquelles la performance du projet est mesurée.","Appliquer des activités qualité planifiées et systématiques pour garantir un contrôle efficace."],a:1,e:"'Gérer la qualité' traduit le plan qualité en activités exécutables et intègre les politiques qualité de l'organisation dans le projet."},
+{id:41,d:"Qualité",t:"Le coût de la qualité comprend tous les éléments suivants SAUF :",o:["L'évaluation du produit ou du service afin de vérifier sa conformité aux exigences.","Le non-respect des exigences (reprises).","L'exploitation des ordinateurs nécessaires au projet.","La prévention des non-conformités aux exigences."],a:2,e:"L'exploitation des ordinateurs est un coût opérationnel général, pas un coût de la qualité. Le CoQ comprend : prévention, évaluation, défaillances internes et externes."},
+{id:42,d:"Qualité",t:"En raison de la nature temporaire des projets et des avantages potentiels pouvant découler de la réduction du coût de la qualité après projet, ______ peuvent choisir d'investir dans l'amélioration de la qualité du produit :",o:["L'équipe de management du projet","L'organisation de déploiement de la fonction qualité","L'équipe de direction exécutive du projet","Les organisations sponsors"],a:3,e:"Les organisations sponsors ont intérêt à long terme à réduire les coûts de non-qualité post-projet. Ce sont elles qui financent et bénéficient de l'amélioration qualité."},
+{id:43,d:"Qualité",t:"En ce qui concerne les cartes de contrôle, sur quoi reposent les limites supérieures et inférieures de spécification ?",o:["Les spécifications, reflétant les valeurs maximales et minimales autorisées.","Les limites de contrôle.","Les exigences et les limites de contrôle.","Les exigences, reflétant les valeurs maximales et minimales autorisées."],a:3,e:"Les limites de spécification (LSS/LIS) sont basées sur les EXIGENCES du client, pas sur les calculs statistiques (±3σ qui définissent les limites de contrôle)."},
+{id:44,d:"Qualité",t:"................ est le processus consistant à auditer les exigences qualité et les résultats des mesures du contrôle qualité afin de s'assurer que des normes qualité appropriées et des définitions opérationnelles sont utilisées.",o:["Planifier l'assurance qualité","Contrôler la qualité","Gérer la qualité","Planifier le management de la qualité"],a:2,e:"'Gérer la qualité' est le processus d'audit des exigences qualité et des mesures du CQ, s'assurant que les normes et définitions opérationnelles sont bien appliquées."},
+{id:45,d:"Qualité",t:"Lors de l'utilisation de l'analyse coûts-bénéfices dans le processus Planifier le management de la qualité, il peut être noté que :",o:["Le principal coût du respect des exigences qualité est l'augmentation des reprises.","Le principal avantage du respect des exigences qualité est la réduction des coûts de management de la qualité.","Le coût de la qualité ne peut pas être évalué par rapport aux bénéfices attendus.","Les principaux avantages comprennent : moins de reprises, productivité plus élevée, coûts plus faibles, satisfaction accrue des parties prenantes et rentabilité améliorée."],a:3,e:"Respecter les exigences qualité génère tous ces bénéfices tangibles : moins de reprises, productivité accrue, coûts réduits, parties prenantes satisfaites."},
+{id:46,d:"Qualité",t:"Le benchmarking consiste à comparer les pratiques réelles ou planifiées du projet à celles de projets comparables présentant toutes les caractéristiques suivantes SAUF :",o:["Dans le même domaine d'application mais pas dans un domaine d'application différent.","Au sein de l'organisation exécutante ou en dehors de celle-ci.","Afin d'identifier les meilleures pratiques et de générer des idées d'amélioration.","Afin de fournir une base pour mesurer la performance."],a:0,e:"Le benchmarking peut se faire entre différents domaines d'application. L'objectif est d'apprendre des meilleures pratiques quelle que soit l'industrie."},
+{id:47,d:"Qualité",t:"La base de l'amélioration continue de la qualité est le :",o:["Le cycle prêt-viser-tirer (RAF) lié par les résultats.","Le diagramme de programme de décision de processus (PDPC)","Le cycle conceptualiser-concevoir-exécuter-terminer (CDEF)","Le cycle planifier-faire-vérifier-agir (PDCA) tel que défini par Shewhart et modifié par Deming."],a:3,e:"Le cycle PDCA (Plan-Do-Check-Act) de Shewhart/Deming est le fondement de l'amélioration continue utilisé en management de la qualité."},
+{id:48,d:"Qualité",t:"Toutes les affirmations suivantes concernant les diagrammes d'affinité sont vraies SAUF :",o:["Ils peuvent être utilisés pour structurer la décomposition du périmètre et améliorer la création de la WBS.","Ils sont utilisés pour générer des idées pouvant être reliées afin de former des schémas organisés.","Ils sont similaires aux techniques de cartographie mentale.","Ils sont utilisés pour identifier les principaux problèmes et les alternatives à prioriser."],a:3,e:"Les diagrammes d'affinité regroupent des idées par thèmes, ils ne sont pas utilisés pour identifier/prioriser des décisions — ce rôle appartient à d'autres outils."},
+{id:49,d:"Qualité",t:"Tous les éléments suivants sont des considérations d'adaptation en management de la qualité du projet SAUF :",o:["Amélioration continue.","Conformité aux politiques et audits.","Normes et conformité réglementaire","Management des parties prenantes."],a:3,e:"Le management des parties prenantes est un domaine de connaissance séparé, pas une considération d'adaptation spécifique au management de la qualité."},
+{id:50,d:"Ressources",t:"Laquelle des affirmations suivantes concernant l'équipe de management du projet et l'équipe projet est inexacte ?",o:["L'équipe de management du projet est un sous-ensemble de l'équipe projet.","Pour les petits projets, les responsabilités de management du projet sont partagées par toute l'équipe ou assurées uniquement par le chef de projet.","L'équipe de management du projet est également appelée équipe centrale, exécutive ou de direction.","L'équipe projet est responsable d'activités telles que la planification, le contrôle et la clôture."],a:3,e:"La PLANIFICATION, CONTRÔLE et CLÔTURE sont des responsabilités de l'équipe de MANAGEMENT du projet. L'équipe projet exécute les travaux."},
+{id:51,d:"Ressources",t:"En tant que chef de projet, vous souhaitez disposer d'un système de reconnaissance et de récompense. Laquelle des affirmations suivantes est incorrecte ?",o:["La reconnaissance et les récompenses doivent tenir compte des différences culturelles.","Les systèmes de reconnaissance et de récompense doivent promouvoir ou renforcer les comportements souhaités.","Reconnaître les membres de l'équipe qui travaillent des heures supplémentaires le week-end.","Accorder de la reconnaissance à l'équipe tout au long du cycle de vie du projet."],a:0,e:"Bien que les différences culturelles doivent être respectées dans la mise en œuvre, l'affirmation comme formulée est incorrecte — les récompenses doivent être équitables et basées sur la performance."},
+{id:52,d:"Ressources",t:"Les outils et techniques pour acquérir les ressources comprennent tous les éléments suivants SAUF :",o:["Préaffectation.","Compétences interpersonnelles et d'équipe.","Acquisition.","Prise de décision."],a:3,e:"La prise de décision n'est pas un outil/technique spécifique du processus 'Acquérir les ressources' selon le PMBOK. Les outils reconnus : préaffectation, acquisition, équipes virtuelles, compétences interpersonnelles."},
+{id:53,d:"Ressources",t:"Toutes les affirmations suivantes concernant la gestion des conflits sont vraies SAUF :",o:["Elle doit être traitée en utilisant une approche directe et collaborative.","Elle doit généralement être traitée en privé.","Elle ne doit être traitée que lorsqu'elle devient perturbatrice et lors d'une réunion officielle de l'équipe.","Elle est inévitable dans un environnement projet et doit être traitée rapidement."],a:2,e:"Les conflits ne doivent PAS attendre d'être perturbateurs ni être traités uniquement en réunion officielle. La bonne pratique : traitement rapide, en privé, de façon collaborative."},
+{id:54,d:"Ressources",t:"Dans votre projet, vous avez documenté les rôles du projet comme responsable, redevable, consulté et informé. Une bonne manière de représenter ces informations est :",o:["Matrice d'affectation des responsabilités","Structure de découpage des ressources","Structure de découpage du travail","Format orienté texte"],a:0,e:"RACI (Responsable, Accountable, Consulté, Informé) est représenté dans une Matrice d'Affectation des Responsabilités (RAM/RACI Chart)."},
+{id:55,d:"Ressources",t:"Vous êtes le sponsor du projet. Parmi les domaines suivants, dans lequel n'interviendriez-vous PAS ?",o:["Suivi de l'avancement","Création de la liste des activités","Financement du projet","Clarification du périmètre"],a:1,e:"La création de la liste des activités est une tâche technique de l'équipe projet. Le sponsor s'occupe de financement, de périmètre et de suivi, pas des détails opérationnels."},
+{id:56,d:"Ressources",t:"Lequel des organigrammes suivants possède un format hiérarchique ?",o:["Structure de découpage du travail","Formats orientés texte","Diagramme RACI","Structure de découpage organisationnelle"],a:3,e:"La Structure de Découpage Organisationnelle (OBS) a un format hiérarchique qui montre les relations d'autorité dans l'organisation."},
+{id:57,d:"Ressources",t:"Vous investissez beaucoup de temps dans le développement de l'équipe. Lequel des indicateurs suivants n'utiliserez-vous PAS pour évaluer l'efficacité de votre équipe ?",o:["Amélioration des compétences et du moral aidant l'équipe à mieux fonctionner en groupe.","Livraison des livrables du projet avant la date prévue.","Réduction du taux d'attrition du personnel.","Amélioration des compétences des membres de l'équipe."],a:1,e:"Livrer avant la date prévue peut indiquer une mauvaise planification. Ce n'est pas un indicateur fiable du développement d'équipe."},
+{id:58,d:"Ressources",t:"Dans votre projet, vous utilisez le processus Développer l'équipe pour améliorer les compétences et l'interaction des membres. Le résultat de ce processus est :",o:["Plan de management du personnel","Toutes les réponses ci-dessus","Évaluations de la performance de l'équipe","Affectations du personnel du projet"],a:2,e:"L'extrant principal de 'Développer l'équipe' est les évaluations de la performance de l'équipe, qui mesurent l'efficacité du développement réalisé."},
+{id:59,d:"Ressources",t:"Dans votre projet, vous établissez des attentes claires concernant le comportement acceptable des membres de l'équipe projet. Ces attentes et directives sont également appelées :",o:["Charte d'équipe","Règles de conduite","Activités de consolidation d'équipe","Compétences interpersonnelles"],a:0,e:"La Charte d'équipe (Team Charter) documente les valeurs, accords et règles de comportement de l'équipe projet."},
+{id:60,d:"Ressources",t:"En tant que chef de projet, vous êtes en train de créer une liste de tous les membres de l'équipe de projet, de leurs rôles et des informations de communication. Ces informations doivent se trouver dans :",o:["Rapports de performance","Plan de projet","Matrice d'attribution des responsabilités","Répertoire de l'équipe de projet"],a:3,e:"Le Répertoire de l'équipe de projet (Project Team Directory) liste les membres, leurs rôles et coordonnées de communication."},
+{id:61,d:"Communications",t:"Vous êtes responsable des approvisionnements et vous êtes chargé de gérer des contrats d'approvisionnement complexes. Lequel des moyens suivants est le plus efficace pour gérer des communications complexes ?",o:["Oral informel","Écrit informel","Oral formel","Écrit formel"],a:3,e:"Pour les contrats complexes, l'écrit formel est indispensable : il crée une trace légale, est précis, non ambigu et constitue une référence contractuelle."},
+{id:62,d:"Communications",t:"Les processus utilisés dans le management des communications du projet sont :",o:["Planifier le management des communications, Maîtriser les communications et Maîtrise intégrée des modifications.","Planifier le management des communications, Clôture administrative, Maîtriser les communications et Gérer les communications.","Planifier le management des communications, Gérer les communications et Surveiller les communications.","Maîtriser les communications, Gérer les communications et Clôture administrative."],a:2,e:"Les 3 processus PMBOK de management des communications : Planifier le management des communications, Gérer les communications, Surveiller les communications."},
+{id:63,d:"Communications",t:"Vous avez récemment repris un projet d'un autre chef de projet. Vous souhaitez savoir quel type d'informations fournir aux différentes parties prenantes et quelles méthodes adopter. Vous trouverez ces informations dans le :",o:["Rapports de performance","Plan de management des communications","Dossiers du projet","Plan de communication"],a:1,e:"Le Plan de management des communications définit QUI reçoit QUOI, QUAND et par QUEL canal — la référence pour la communication avec les parties prenantes."},
+{id:64,d:"Communications",t:"Dans votre projet, vous êtes prêt à distribuer les informations aux parties prenantes comme prévu. Lequel des intrants suivants utiliserez-vous à cette fin ?",o:["Modifications demandées","Rapports de performance du travail","Livrables","Méthodes d'information"],a:1,e:"Les rapports de performance du travail (Work Performance Reports) sont les intrants clés pour distribuer les informations dans 'Gérer les communications'."},
+{id:65,d:"Communications",t:"Dans votre projet, vous surveillez les communications tout au long du cycle de vie du projet afin de garantir que les besoins d'information des parties prenantes sont satisfaits. Cela se fait par :",o:["Management de la valeur acquise","Processus Planifier le management des communications","Processus Gérer les communications","Processus Surveiller les communications"],a:3,e:"'Surveiller les communications' s'assure en continu que les besoins d'information des parties prenantes sont satisfaits tout au long du projet."},
+{id:66,d:"Communications",t:"Les activités de communication ont de nombreuses dimensions potentielles qui comprennent généralement toutes les suivantes SAUF :",o:["Interne et externe.","Écrite, orale et non verbale.","Formelle et informelle.","Conceptuelle et définitive."],a:3,e:"'Conceptuelle et définitive' ne sont pas des dimensions reconnues dans le PMBOK. Les dimensions reconnues : interne/externe, formelle/informelle, verticale/horizontale, écrite/orale/non verbale."},
+{id:67,d:"Communications",t:"Laquelle des affirmations suivantes concernant l'analyse des besoins en communication est inexacte ?",o:["Les ressources du projet sont consacrées à la communication d'informations dont l'absence peut entraîner l'échec.","L'objectif est d'éviter de surcharger les parties prenantes avec des détails mineurs.","Les exigences sont définies en combinant le type et le format des informations nécessaires avec une analyse du coût de ces informations.","Les ressources du projet sont consacrées à la communication d'informations qui contribuent au succès."],a:2,e:"L'analyse des besoins ne combine pas le type/format avec le COÛT. Elle identifie les besoins en combinant type, format et valeur des informations pour les parties prenantes."},
+{id:68,d:"Communications",t:"Lequel des éléments suivants N'EST PAS un extrant du processus Gérer les communications ?",o:["Dossiers du projet","Rapports de performance","Notifications aux parties prenantes","Rapports et présentations du projet"],a:1,e:"Les rapports de performance sont un INTRANT de 'Gérer les communications', pas un extrant. Les extrants : communications du projet, mises à jour du plan, mises à jour des documents."},
+{id:69,d:"Communications",t:"Tous les éléments suivants sont des outils de gestion et de diffusion de l'information SAUF :",o:["Outils électroniques de management de projet.","Gestion des documents papier.","Saisie des données de performance du projet dans une feuille de calcul ou une base de données.","Gestion électronique des communications"],a:2,e:"La saisie de données de performance est une activité de collecte/traitement, pas un outil de GESTION ET DIFFUSION de l'information."},
+{id:70,d:"Risques",t:"Laquelle des techniques de planification des réponses aux risques suivantes utiliserez-vous pour transférer l'impact d'une menace à un tiers ?",o:["Évitement du risque","Transfert du risque","Atténuation du risque","Acceptation du risque"],a:1,e:"Le Transfert du risque (assurance, garanties, contrats) transfère l'impact financier d'une menace à un tiers, déplaçant la responsabilité."},
+{id:71,d:"Risques",t:"Lors de la planification des réponses aux risques, vous déterminez qu'il existe une possibilité d'obtenir de nouvelles commandes à l'avenir dépassant la capacité actuelle de vos installations de production. Que devez-vous faire ?",o:["Classer cela comme une opportunité et exploiter l'opportunité.","Classer cela comme une menace et créer des plans de contournement.","Classer cela comme une faiblesse et la transférer à une autre entreprise.","Classer cela comme une force et créer un plan de secours."],a:0,e:"De nouvelles commandes dépassant la capacité est une OPPORTUNITÉ de croissance. La bonne réponse est d'EXPLOITER cette opportunité en planifiant l'expansion de capacité."},
+{id:72,d:"Risques",t:"Laquelle des affirmations suivantes concernant l'identification des risques est vraie ?",o:["L'identification des risques a lieu pendant la planification du projet.","L'identification des risques a lieu pendant l'exécution du projet","L'identification des risques a lieu à différentes étapes du projet selon le type de projet.","L'identification des risques a lieu pendant la surveillance et la maîtrise du projet."],a:2,e:"L'identification des risques est un processus ITÉRATIF qui se déroule tout au long du projet — pas limitée à une seule phase."},
+{id:73,d:"Risques",t:"Ahmed a rejoint le projet. L'un des documents du projet disponibles répertorie tous les risques de manière hiérarchique. Comment s'appelle ce document ?",o:["Structure de découpage des risques.","Diagramme de Monte Carlo.","Plan de management des risques.","Liste des risques."],a:0,e:"La Structure de Découpage des Risques (RBS - Risk Breakdown Structure) organise les risques de manière hiérarchique par catégories."},
+{id:74,d:"Risques",t:"Laquelle des affirmations suivantes est vraie concernant les risques ?",o:["Le plan de réponse aux risques est un autre nom du plan de management des risques.","Les risques, s'ils se produisent, ont toujours un impact négatif et jamais positif.","Le registre des risques documente tous les risques en détail.","Lors de l'évaluation des risques, leur impact doit être pris en compte, mais la probabilité d'occurrence n'est pas importante."],a:2,e:"Le registre des risques est le document central qui documente tous les risques identifiés. Les risques peuvent être positifs (opportunités) ET la probabilité EST importante."},
+{id:75,d:"Risques",t:"Vous vous préoccupez de déterminer quels risques peuvent affecter le projet. Quel est le processus par lequel ces risques sont déterminés ?",o:["Effectuer l'analyse qualitative des risques","Planifier le management des risques","Planifier les réponses aux risques","Identifier les risques"],a:3,e:"'Identifier les risques' est le processus dédié à la détermination des risques qui peuvent affecter le projet et à la documentation de leurs caractéristiques."},
+{id:76,d:"Risques",t:"Puisque vous ne pouvez pas planifier toutes les éventualités, vous établissez une réserve pour aléas, comprenant des quantités de temps, d'argent ou de ressources. Ceci est un exemple de :",o:["Évitement du risque","Transfert du risque","Planification inadéquate des risques car tous les risques doivent être identifiés","Acceptation active du risque"],a:3,e:"Établir une réserve pour aléas (contingency reserve) est une stratégie d'ACCEPTATION ACTIVE — on reconnaît que des risques inconnus existent et on planifie des ressources."},
+{id:77,d:"Risques",t:"En gérant un projet, vous décidez d'abord de créer un prototype de votre produit afin de vous assurer qu'il est acceptable pour les parties prenantes avant de créer votre produit. Ceci est un exemple de :",o:["Simulation","Vérification des hypothèses du projet","Atténuation du risque","Évitement du risque"],a:2,e:"Créer un prototype pour valider l'acceptabilité AVANT la production complète est une stratégie d'ATTÉNUATION du risque."},
+{id:78,d:"Risques",t:"Dans le cadre du processus de management des risques, vous venez de créer un classement global des risques et une liste hiérarchisée des risques identifiés nécessitant une analyse supplémentaire. Que devez-vous faire ensuite ?",o:["Tenir un registre des risques","Établir une liste de réponses potentielles aux risques","Analyser l'effet des risques identifiés sur les objectifs globaux du projet","Créer une liste des risques identifiés"],a:2,e:"Après l'analyse qualitative (classement/priorisation), l'étape suivante est l'analyse quantitative : analyser l'effet des risques prioritaires sur les objectifs globaux."},
+{id:79,d:"Risques",t:"Certains membres de votre équipe de projet se plaignent que discuter des risques dans les réunions d'avancement est une perte de temps. Que devez-vous faire ?",o:["Être d'accord et supprimer ce point de l'ordre du jour.","Parler avec les membres de l'équipe de l'importance du management des risques et expliquer pourquoi l'équipe doit être consciente de tous les risques à tout moment.","Organiser une réunion avec le commanditaire pour discuter des besoins de formation.","Signaler à votre direction que certains membres ne sont pas d'accord avec vos pratiques."],a:1,e:"La bonne pratique est d'éduquer l'équipe sur l'importance du management des risques. Si aucun risque ne s'est produit, c'est précisément grâce à la vigilance."},
+{id:80,d:"Approvisionnements",t:"Quel devrait être l'objectif le plus important d'un contrat lors de la négociation des contrats ?",o:["L'objectif peut varier selon le type de contrat","S'assurer que la négociation est menée conformément aux dispositions légales","Négocier le meilleur prix et protéger les intérêts de l'acheteur","Protéger les intérêts du projet"],a:3,e:"L'objectif principal d'un contrat est de PROTÉGER LES INTÉRÊTS DU PROJET — s'assurer que le projet atteint ses objectifs, pas uniquement de protéger l'acheteur ou le prix."},
+{id:81,d:"Approvisionnements",t:"Dans votre projet, vous concluez un contrat à prix fixe. Le contrat concerne un élément spécifié à livrer à une date précise pour un prix spécifié. Dans le contrat, le profit est :",o:["Fourni par l'acheteur au vendeur à la fin du projet si les critères de performance sont atteints","Déterminé par le vendeur lors de la signature du contrat","Inconnu au moment de la signature du contrat","Déterminé par l'acheteur lors de la signature du contrat"],a:1,e:"Dans un contrat à prix fixe, c'est le VENDEUR qui détermine son profit lors de la signature en intégrant sa marge dans le prix fixe proposé."},
+{id:82,d:"Approvisionnements",t:"Lequel des éléments suivants est un type hybride d'accord contractuel ?",o:["Contrats à prix fixe","Contrats de temps et matériel","Contrats à remboursement des coûts","Contrats à prix fixe avec redétermination"],a:1,e:"Les contrats Temps et Matériel (T&M) sont des contrats HYBRIDES : ils combinent éléments du prix fixe (taux unitaires fixes) et du remboursement des coûts (quantités variables)."},
+{id:83,d:"Approvisionnements",t:"Laquelle des affirmations suivantes concernant les documents d'approvisionnement est exacte :",o:["Les demandes adressées aux vendeurs potentiels sont émises officiellement conformément aux politiques de l'organisation de l'acheteur.","L'acheteur structure les documents d'approvisionnement afin de faciliter une réponse précise et complète des vendeurs potentiels.","Le terme 'proposition' est généralement utilisé lorsque la décision de sélection du vendeur sera fondée sur le prix.","Le terme 'offre' est généralement utilisé lorsque la décision de sélection du vendeur sera fondée sur d'autres critères que le prix."],a:2,e:"'Proposition' (RFP) est utilisé quand la sélection est basée sur des critères techniques/qualité. Quand c'est basé sur le PRIX, on parle d'appel d'offres (IFB/ITB)."},
+{id:84,d:"Approvisionnements",t:"Vous souhaitez identifier les réussites et les échecs qui méritent d'être pris en compte dans la préparation ou l'administration d'autres contrats d'approvisionnement. Cela peut être effectué par :",o:["Audit des approvisionnements","Documentation des leçons apprises","Rapports de performance du contrat","Dossier du contrat"],a:0,e:"L'audit des approvisionnements est le processus qui passe en revue le processus d'approvisionnement pour identifier les réussites et échecs — c'est son objectif premier."},
+{id:85,d:"Approvisionnements",t:"Dans votre projet, vous souhaitez gérer les relations d'approvisionnement, surveiller la performance du contrat et effectuer les modifications nécessaires. Lequel des éléments suivants n'utiliseriez-vous pas ?",o:["Accords","Données de performance du travail","Demandes de modification approuvées","Échéancier du projet"],a:3,e:"L'échéancier du projet n'est pas un intrant direct du processus 'Maîtriser les approvisionnements'. On utilise les accords, données de performance et demandes de modification."},
+{id:86,d:"Approvisionnements",t:"Vous souhaitez diffuser à tous les fournisseurs les critères importants de sélection des sources. Parmi les suivants, lesquels sont des critères possibles ? 1. Compréhension du besoin  2. Droits de propriété  3. Références  4. Capacité technique",o:["Tout ce qui précède","Aucun de ce qui précède","2, 3 et 4","1, 2 et 4"],a:0,e:"Tous ces éléments sont des critères de sélection valides : compréhension du besoin, droits de propriété, références et capacité technique."},
+{id:87,d:"Approvisionnements",t:"Dans votre projet, vous souhaitez créer un document qui décrit l'élément à approvisionner avec suffisamment de détails afin que les vendeurs puissent déterminer s'ils sont capables de le fournir. Ce document est appelé :",o:["Documents d'approvisionnement","Énoncé des travaux d'approvisionnement","Audit des approvisionnements","Dossier du contrat"],a:1,e:"L'Énoncé des Travaux d'Approvisionnement (SOW) décrit l'élément à acheter en détail suffisant pour que les vendeurs évaluent leur capacité à le fournir."},
+{id:88,d:"Approvisionnements",t:"Vous souhaitez utiliser le processus Effectuer les approvisionnements afin d'obtenir des devis. Lequel des outils suivants peut être utilisé ? 1. Conférence des soumissionnaires  2. Réunions  3. Publicité  4. Négociations des approvisionnements",o:["3 et 4","1 seulement","2, 3 et 4","1, 3 et 4"],a:3,e:"La conférence des soumissionnaires (1), la publicité (3) et les négociations (4) sont des outils d'Effectuer les approvisionnements. Les réunions (2) sont trop génériques."},
+{id:89,d:"Approvisionnements",t:"Laquelle des affirmations suivantes concernant les contrats de temps et matériel (T&M) est exacte ?",o:["Les contrats T&M ne peuvent pas augmenter en valeur comme un contrat à remboursement des coûts.","Ces types de contrats ressemblent aux accords à remboursement des coûts, car ils en sont proches.","Les taux unitaires peuvent être fixés par l'acheteur et le vendeur lorsque les deux parties s'accordent sur les valeurs des catégories spécifiques de ressources.","Les contrats T&M sont uniquement utilisés pour les petits projets."],a:2,e:"Dans les contrats T&M, les taux unitaires (par heure, par unité) sont fixés d'accord entre acheteur et vendeur pour chaque catégorie de ressources."},
+{id:90,d:"Parties Prenantes",t:"Lequel des éléments suivants NE serait PAS considéré comme un actif organisationnel utile lors de l'identification des parties prenantes ?",o:["Leçons apprises des phases précédentes","Registres des parties prenantes des projets précédents","Culture organisationnelle pour identifier les parties prenantes","Modèles de registre des parties prenantes"],a:2,e:"La culture organisationnelle est un FACTEUR ENVIRONNEMENTAL DE L'ENTREPRISE, pas un actif des processus organisationnels. Les actifs : leçons apprises, registres précédents, modèles."},
+{id:91,d:"Parties Prenantes",t:"La classification des niveaux d'engagement des parties prenantes comprend tous les éléments suivants SAUF :",o:["Manipulateur.","Favorable.","Neutre.","Résistant."],a:0,e:"Les niveaux d'engagement PMBOK : Non conscient, Résistant, Neutre, Favorable, Leader. 'Manipulateur' n'est pas un niveau d'engagement reconnu."},
+{id:92,d:"Parties Prenantes",t:"La responsabilité de la gestion des attentes des parties prenantes incombe généralement au :",o:["Chef de projet","Chef de projet, commanditaire du projet et équipe de management de projet","Équipe de projet","Équipe de management de projet"],a:0,e:"Selon le PMBOK, la responsabilité principale de la gestion des attentes des parties prenantes incombe au CHEF DE PROJET."},
+{id:93,d:"Parties Prenantes",t:"Vous, en tant que chef de projet, prévoyez de documenter les informations pertinentes sur les intérêts, l'implication, l'influence et l'impact des parties prenantes du projet. Lequel des processus suivants devez-vous suivre ?",o:["Planifier le management des communications","Analyse des parties prenantes","Gérer l'engagement des parties prenantes","Identifier les parties prenantes"],a:3,e:"'Identifier les parties prenantes' est le processus qui documente les informations sur les intérêts, implication, influence et impact des parties prenantes."},
+{id:94,d:"Parties Prenantes",t:"Pendant le processus Identifier les parties prenantes, quel document peut fournir une idée initiale de qui sont les parties prenantes d'un projet ?",o:["Contrats des ressources humaines","Charte du projet","Matrice d'attribution des responsabilités","Plan de management des risques"],a:1,e:"La Charte du projet identifie les principales parties prenantes et donne les informations initiales sur qui est impliqué dans le projet."},
+{id:95,d:"Parties Prenantes",t:"La matrice d'évaluation de l'engagement des parties prenantes est utilisée pour :",o:["Maintenir la satisfaction des parties prenantes","Engager les parties prenantes","Analyser l'efficacité du plan de management des parties prenantes","Comparer les niveaux actuels et planifiés d'engagement des parties prenantes"],a:3,e:"La matrice d'évaluation compare les niveaux ACTUELS (C) et DÉSIRÉS (D) d'engagement pour identifier les écarts à combler."},
+{id:96,d:"Parties Prenantes",t:"Les informations sur toutes les parties prenantes du projet ainsi que leurs intérêts, attentes et influences respectifs sont documentées dans le :",o:["Registre des parties prenantes","Matrice d'analyse des parties prenantes","Répertoire des parties prenantes","Plan de management des parties prenantes"],a:0,e:"Le Registre des parties prenantes est le document central qui documente toutes les informations : intérêts, attentes, influences et relations."},
+{id:97,d:"Parties Prenantes",t:"Le modèle de classification grille pouvoir/intérêt pour l'analyse des parties prenantes suggère :",o:["Tenir informées les parties prenantes à fort pouvoir et fort intérêt.","Maintenir satisfaites les parties prenantes à fort pouvoir et faible intérêt.","Gérer étroitement les parties prenantes à faible pouvoir et faible intérêt.","Surveiller les parties prenantes à faible pouvoir et fort intérêt."],a:1,e:"Grille Pouvoir/Intérêt : Fort pouvoir/Faible intérêt = Maintenir satisfaites. Fort/Fort = Gérer étroitement. Faible/Fort = Tenir informées. Faible/Faible = Surveiller."},
+{id:98,d:"Parties Prenantes",t:"Quel document du projet est utilisé pour documenter et surveiller les éléments en discussion ou en litige entre les parties prenantes du projet ?",o:["Journal des problèmes","Journal des modifications","Journal des incidents","Journal des litiges"],a:2,e:"Le Journal des incidents (Issue Log) est utilisé pour documenter et suivre les éléments en discussion, problèmes ou litiges entre les parties prenantes."},
+{id:99,d:"Parties Prenantes",t:"En tant que chef de projet, vous avez identifié les parties prenantes de votre projet. Que devez-vous faire ensuite ?",o:["Créer le plan de management du projet","Mettre à jour la charte du projet","Créer le registre des parties prenantes","Créer le plan de management des communications"],a:2,e:"Après avoir identifié les parties prenantes, l'extrant immédiat est le REGISTRE DES PARTIES PRENANTES — le document produit par ce processus."},
+{id:100,d:"Parties Prenantes",t:"Lequel des outils suivants constitue un outil important à la disposition du chef de projet pour recueillir et organiser les informations relatives aux parties prenantes ?",o:["Groupes de discussion","Histogrammes","Cartes de contrôle","Diagrammes d'Ishikawa"],a:0,e:"Les groupes de discussion (Focus Groups) permettent de recueillir les opinions et informations des parties prenantes de manière structurée."},
+{id:101,d:"Parties Prenantes",t:"Au cours de lequel des processus suivants les principales parties prenantes s'engagent-elles pour la première fois dans le projet ?",o:["Identifier les parties prenantes","Élaborer la charte du projet","Planifier l'engagement des parties prenantes","Recueillir les exigences"],a:1,e:"Les parties prenantes principales s'engagent pour la PREMIÈRE FOIS lors de l'élaboration de la charte du projet — c'est là que le projet est formellement autorisé."},
+{id:102,d:"Périmètre",t:"Lequel des composants suivants de l'énoncé du contenu du projet est utile pour réduire la dérive du périmètre ?",o:["Critères d'acceptation","Description du périmètre","Exclusions","Livrables"],a:2,e:"Les EXCLUSIONS définissent explicitement ce qui N'est PAS inclus dans le projet. C'est l'outil le plus efficace pour prévenir la dérive du périmètre (scope creep)."},
+{id:103,d:"Échéancier",t:"Lorsque vous créez la liste des activités, quelle technique est recommandée pour subdiviser le projet en composants plus petits appelés activités ?",o:["Planification par vagues successives","Jugement d'expert","Déconstruction","Décomposition"],a:3,e:"La DÉCOMPOSITION est la technique principale pour subdiviser les lots de travaux en activités plus petites et gérables dans 'Définir les activités'."},
+{id:104,d:"Parties Prenantes",t:"Parmi les parties prenantes suivantes, laquelle ne peut pas guider le chef de projet dans l'élaboration de stratégies efficaces pour les parties prenantes internes ?",o:["Clients","Commanditaire","Membres de l'équipe projet","Principales parties prenantes identifiées"],a:0,e:"Les CLIENTS sont des parties prenantes EXTERNES. Pour les stratégies relatives aux parties prenantes internes, on consulte les parties internes (sponsor, équipe, parties prenantes identifiées)."},
+{id:105,d:"Périmètre",t:"Le processus Créer la WBS identifie les livrables au niveau ...............de la structure de découpage du projet.",o:["Le plus élevé","Le plus bas","Dixième","N'importe quel"],a:1,e:"La WBS décompose les livrables jusqu'au niveau le plus bas appelé 'lot de travaux' (work package) — le niveau auquel le travail peut être estimé, planifié et surveillé."}
+];
+
+// ════════════════════════════════════════════════
+// QUESTIONS — 105 PMP (Examen Blanc N°2)
+// ════════════════════════════════════════════════
+const Q2 = [
+{id:1,d:"Parties Prenantes",t:"Les parties prenantes sont :",o:["Les ingénieurs du projet qui conçoivent et réalisent le projet.","Les avocats de l'entreprise.","Les personnes, groupes ou organisations susceptibles d'influencer ou d'être influencés par une décision, une activité ou un résultat du projet.","Les individus ou organismes qui contrôlent les fonds de réserve et leur décaissement par l'intermédiaire du bureau de gestion de projet (PMO)."],a:2,e:"La définition PMBOK officielle : les parties prenantes sont toutes les personnes, groupes ou organisations susceptibles d'influencer ou d'être influencés par le projet."},
+{id:2,d:"Parties Prenantes",t:"Lequel des éléments suivants N'EST PAS un processus du management des parties prenantes du projet ?",o:["Identifier les parties prenantes.","Gérer l'engagement des parties prenantes.","Contrôler l'engagement des parties prenantes.","Surveiller l'engagement des parties prenantes."],a:2,e:"Le PMBOK 6e édition liste 4 processus : Identifier, Planifier l'engagement, Gérer l'engagement, Surveiller l'engagement. 'Contrôler' n'est pas un processus officiel du management des parties prenantes."},
+{id:3,d:"Parties Prenantes",t:"Afin d'augmenter les chances de réussite du projet, le chef de projet doit effectuer toutes les actions suivantes SAUF :",o:["Communiquer et travailler avec les parties prenantes afin de satisfaire leurs besoins et attentes.","Analyser le niveau d'intérêt, les attentes individuelles, l'importance et l'influence des parties prenantes.","Identifier les parties prenantes dès le début du projet ou de la phase.","Créer autant que possible des conflits entre les différentes parties prenantes afin de permettre à l'équipe projet d'obtenir des performances optimales."],a:3,e:"Créer des conflits entre les parties prenantes est une mauvaise pratique qui nuira au projet. Le chef de projet doit au contraire favoriser la collaboration et gérer les conflits de façon constructive."},
+{id:4,d:"Parties Prenantes",t:"Vous développez des stratégies de management afin d'impliquer efficacement les parties prenantes tout au long du cycle de vie du projet, sur la base de l'analyse de leurs besoins, intérêts et impacts potentiels sur la réussite du projet. Ce processus est appelé :",o:["Gérer l'engagement des parties prenantes.","Surveiller l'engagement des parties prenantes.","Planifier l'engagement des parties prenantes.","Planifier le management des parties prenantes."],a:2,e:"'Planifier l'engagement des parties prenantes' est le processus qui développe des approches pour impliquer les parties prenantes en se basant sur leurs besoins, intérêts et impacts potentiels."},
+{id:5,d:"Parties Prenantes",t:"Vous participez au processus consistant à communiquer et travailler avec les parties prenantes afin de satisfaire leurs besoins et attentes, traiter les problèmes lorsqu'ils surviennent et favoriser un engagement approprié des parties prenantes dans les activités du projet tout au long du cycle de vie du projet. Ce processus est appelé :",o:["Surveiller l'engagement des parties prenantes.","Planifier l'engagement des parties prenantes.","Planifier le management des parties prenantes.","Gérer l'engagement des parties prenantes."],a:3,e:"'Gérer l'engagement des parties prenantes' est le processus actif de communication et de travail avec les parties prenantes pour satisfaire leurs besoins et traiter les problèmes."},
+{id:6,d:"Parties Prenantes",t:"Vous surveillez les relations globales avec les parties prenantes du projet et ajustez les stratégies d'engagement des parties prenantes. Ce processus est appelé :",o:["Gérer l'engagement des parties prenantes.","Surveiller l'engagement des parties prenantes.","Gestion des relations avec les parties prenantes.","Planifier l'engagement des parties prenantes."],a:1,e:"'Surveiller l'engagement des parties prenantes' est le processus qui surveille les relations et ajuste les stratégies d'engagement tout au long du projet."},
+{id:7,d:"Parties Prenantes",t:"Vous utilisez un modèle de classification pour l'analyse des parties prenantes qui regroupe les parties prenantes selon leur niveau d'autorité et leur niveau de préoccupation concernant les résultats du projet. Ce modèle est appelé :",o:["Modèle de prépondérance.","Grille pouvoir/intérêt.","Grille influence/impact.","Grille pouvoir/influence."],a:1,e:"La Grille Pouvoir/Intérêt regroupe les parties prenantes selon leur niveau d'AUTORITÉ (pouvoir) et leur niveau de PRÉOCCUPATION pour les résultats (intérêt)."},
+{id:8,d:"Parties Prenantes",t:"Lors de l'élaboration du registre des parties prenantes, vous devez inclure tous les éléments suivants SAUF :",o:["La classification des parties prenantes.","Les informations d'identification.","Les informations sur les risques du projet.","Les informations d'évaluation."],a:2,e:"Le registre des parties prenantes contient : informations d'identification, d'évaluation et la classification. Les informations sur les risques du projet appartiennent au registre des risques, pas au registre des parties prenantes."},
+{id:9,d:"Parties Prenantes",t:"La classification des niveaux d'engagement des parties prenantes comprend tous les éléments suivants SAUF :",o:["Manipulatrice.","Résistante.","Favorable","Neutre."],a:0,e:"Les niveaux d'engagement PMBOK : Non consciente, Résistante, Neutre, Favorable, Leader. 'Manipulatrice' n'est pas un niveau reconnu."},
+{id:10,d:"Parties Prenantes",t:"Le processus Gérer l'engagement des parties prenantes comprend toutes les activités suivantes SAUF :",o:["Gérer les attentes des parties prenantes par la négociation et la communication.","Éviter les préoccupations potentielles qui ne sont pas encore devenues des problèmes.","Anticiper les problèmes futurs susceptibles d'être soulevés par les parties prenantes.","Clarifier et résoudre les problèmes identifiés."],a:1,e:"Le processus Gérer l'engagement inclut : gérer les attentes, anticiper les problèmes futurs, clarifier et résoudre les problèmes. 'Éviter les préoccupations' n'est pas une activité de ce processus — on doit les aborder, pas les éviter."},
+{id:11,d:"Parties Prenantes",t:"Toutes les affirmations suivantes concernant le processus Gérer l'engagement des parties prenantes sont vraies, SAUF :",o:["Gérer l'engagement des parties prenantes permet d'augmenter la probabilité de réussite du projet.","Le chef de projet est responsable de l'engagement et de la gestion des différentes parties prenantes du projet et peut solliciter l'aide du sponsor du projet si nécessaire.","La capacité des parties prenantes à influencer le projet est généralement la plus faible au début du projet et augmente progressivement à mesure que le projet avance.","La capacité des parties prenantes à influencer le projet est généralement la plus élevée au début du projet et diminue progressivement à mesure que le projet avance."],a:2,e:"La capacité des parties prenantes à influencer le projet est la plus ÉLEVÉE au DÉBUT et diminue progressivement. L'affirmation C inverse cette réalité."},
+{id:12,d:"Parties Prenantes",t:"Les outils et techniques du processus Surveiller l'engagement des parties prenantes comprennent tous les éléments suivants, SAUF :",o:["Analyse des parties prenantes.","Prise de décision.","Registre des problèmes.","Réunions."],a:2,e:"Le registre des problèmes est un DOCUMENT DE PROJET (intrant/extrant), pas un outil et technique du processus Surveiller l'engagement des parties prenantes."},
+{id:13,d:"Parties Prenantes",t:"Le modèle de classification Grille pouvoir/intérêt pour l'analyse des parties prenantes suggère :",o:["Maintenir satisfaites les parties prenantes ayant un fort pouvoir et un faible intérêt.","Gérer étroitement les parties prenantes ayant un faible pouvoir et un faible intérêt.","Maintenir informées les parties prenantes ayant un fort pouvoir et un fort intérêt.","Surveiller les parties prenantes ayant un faible pouvoir et un fort intérêt."],a:0,e:"Grille Pouvoir/Intérêt : Fort pouvoir/Faible intérêt = Maintenir SATISFAITES. Fort/Fort = Gérer ÉTROITEMENT. Faible/Fort = Tenir INFORMÉES. Faible/Faible = SURVEILLER."},
+{id:14,d:"Parties Prenantes",t:"Lors d'une audience publique concernant le projet de château d'eau ultramoderne proposé par votre entreprise, un résident très concerné par le projet vous interpelle : « Accepteriez-vous que cette chose soit construite dans votre propre quartier ? » Votre meilleure réponse pourrait commencer par :",o:["Étant donné que vous ne figurez pas dans le registre des parties prenantes, je ne peux pas prendre vos préoccupations au sérieux.","Si vous souhaitez avoir une pression d'eau correcte dans votre résidence, vous ne devriez pas interférer avec notre travail.","Étant donné que les experts ont fourni suffisamment d'informations démontrant que l'emplacement proposé est le plus approprié, je serais heureux d'avoir ce château d'eau ultramoderne comme voisin.","Je suis désolé que vous sembliez ne pas apprécier la présence de ce château d'eau dans votre voisinage. Nous chercherons un autre emplacement."],a:2,e:"La meilleure réponse est C : elle répond à la préoccupation avec confiance et données factuelles (les experts ont validé l'emplacement), sans rejeter le résident ni céder sans raison valable."},
+{id:15,d:"Parties Prenantes",t:"Les exemples de compétences interpersonnelles les plus souvent utilisées par un chef de projet comprennent tous les éléments suivants, SAUF :",o:["Prise de décision efficace.","Gouvernance.","Leadership.","Influence."],a:1,e:"La Gouvernance est un cadre organisationnel, pas une compétence interpersonnelle. Les compétences interpersonnelles incluent : leadership, influence, prise de décision, communication, négociation, coaching."},
+{id:16,d:"Agile/Adaptatif",t:"Le cycle de vie du projet est défini comme :",o:["La série de phases par lesquelles passe un projet depuis son démarrage jusqu'à sa clôture.","Le continuum du cycle de vie d'un projet.","Les phases par lesquelles passent un produit ou un service depuis son démarrage jusqu'à sa fin.","Les différentes façons dont les exigences et les plans évoluent depuis la charte du projet jusqu'à l'achèvement du projet."],a:0,e:"Le cycle de vie du projet = la série de phases par lesquelles passe un projet depuis son DÉMARRAGE jusqu'à sa CLÔTURE. C'est la définition officielle PMBOK."},
+{id:17,d:"Agile/Adaptatif",t:"Les projets suivant davantage une approche adaptative du cycle de vie suivent le plus souvent le modèle suivant :",o:["Phases séquentielles basées sur des itérations et phases séquentielles sans chevauchement.","Phases à chevauchement continu et phases basées sur l'agilité.","Phases séquentielles basées sur des itérations et phases à chevauchement continu.","Phases basées sur l'agilité et phases séquentielles basées sur des itérations."],a:3,e:"Les approches adaptatives combinent les phases basées sur l'agilité (sprints, itérations courtes) et les phases séquentielles basées sur des itérations (cycles répétés avec livraisons partielles)."},
+{id:18,d:"Agile/Adaptatif",t:"Tous les éléments suivants sont des groupes de processus dans les environnements adaptatifs, SAUF :",o:["Groupe de processus de surveillance et maîtrise.","Groupe de processus de planification.","Groupe de processus de management du périmètre.","Groupe de processus de clôture."],a:2,e:"Le 'Groupe de processus de management du périmètre' n'existe pas — le périmètre est un DOMAINE DE CONNAISSANCE, pas un groupe de processus. Les groupes de processus PMBOK sont : Démarrage, Planification, Exécution, Surveillance/Maîtrise, Clôture."},
+{id:19,d:"Agile/Adaptatif",t:"Les approches itératives, agiles et adaptatives assurent le suivi, l'examen et la régulation de l'avancement et de la performance en maintenant :",o:["Une liste détaillée des tâches à faire.","Des lots de travaux.","Une structure de découpage du projet.","Un backlog."],a:3,e:"Dans les approches agiles et adaptatives, le BACKLOG est l'outil central de suivi — il liste toutes les fonctionnalités, user stories et tâches à accomplir, priorisées par valeur."},
+{id:20,d:"Agile/Adaptatif",t:"Les cycles de vie __________ développent un ensemble de plans de haut niveau pour les exigences initiales et détaillent progressivement les exigences à un niveau de détail approprié pour chaque cycle de planification.",o:["Adaptatifs","De programme","Prédictifs","Basés sur la planification"],a:0,e:"Les cycles de vie ADAPTATIFS développent des plans de haut niveau initiaux et détaillent progressivement les exigences à chaque cycle/itération — c'est le principe de l'élaboration progressive dans un contexte agile."},
+{id:21,d:"Intégration",t:"L'Annexe X4 indique que le Management de l'intégration du projet comprend tous les éléments suivants, SAUF :",o:["Les projets et le management de projet sont de nature intégrée, la plupart des tâches impliquant plus d'un domaine de connaissances.","Le management de la performance du projet et des changements apportés aux activités du projet.","La prévention est préférable à l'inspection. Il est préférable d'intégrer la qualité dans les livrables plutôt que de détecter des problèmes de qualité lors des inspections.","Les relations entre les processus au sein des groupes de processus de management de projet et entre ceux-ci sont itératives."],a:2,e:"'La prévention est préférable à l'inspection' est un principe du Management de la QUALITÉ, pas de l'Intégration. Ce principe appartient au PMBOK chapitre Qualité."},
+{id:22,d:"Périmètre",t:"Le Management du périmètre du projet comprend tous les éléments suivants, SAUF :",o:["Les cycles de vie du projet se situent sur un continuum allant du prédictif à l'adaptatif. Dans une approche prédictive, le périmètre est défini au début. Dans une approche adaptative, le périmètre est défini au début de chaque itération.","Les projets et le management de projet sont de nature intégrée, la plupart des tâches impliquant plus d'un domaine de connaissances.","Le périmètre peut faire référence au périmètre du produit ou au périmètre du projet.","L'achèvement du périmètre du projet est mesuré par rapport au plan de management du projet. L'achèvement du périmètre du produit est mesuré par rapport aux exigences du produit."],a:1,e:"'Les projets et le management de projet sont de nature intégrée' est un concept du Management de l'INTÉGRATION, pas du management du périmètre."},
+{id:23,d:"Échéancier",t:"Le Management de l'échéancier du projet comprend tous les éléments suivants, SAUF :",o:["L'échéancier du projet est utilisé comme outil de communication, de gestion des attentes des parties prenantes et comme base de reporting de la performance.","Les chefs de projet peuvent avoir besoin de connaître les techniques d'échantillonnage, y compris l'échantillonnage par attributs et l'échantillonnage par variables.","L'élaboration de l'échéancier du projet fournit un plan détaillé représentant comment et quand le projet livrera les produits, services et résultats définis dans le périmètre du projet.","Lorsque cela est possible, l'échéancier détaillé du projet doit rester flexible tout au long du projet afin de s'adapter aux connaissances acquises."],a:1,e:"Les techniques d'échantillonnage (par attributs ou par variables) sont des outils du Management de la QUALITÉ (Maîtriser la qualité), pas de l'échéancier."},
+{id:24,d:"Coûts",t:"Le Management des coûts du projet comprend tous les éléments suivants, SAUF :",o:["La prévision et l'analyse de la performance financière future du produit du projet peuvent être réalisées en dehors du projet ou faire partie du Management des coûts du projet.","Le Management des coûts du projet se concentre principalement sur le coût des ressources nécessaires à l'exécution des activités du projet.","La mesure et la surveillance de l'avancement ainsi que la prise des actions appropriées","Les différentes parties prenantes mesureront les coûts du projet de différentes manières et à différents moments."],a:2,e:"'La mesure et la surveillance de l'avancement ainsi que la prise des actions appropriées' est une description du Management de l'INTÉGRATION (Surveiller et maîtriser), pas spécifiquement du management des coûts."},
+{id:25,d:"Qualité",t:"Le Management de la qualité du projet comprend tous les éléments suivants, SAUF :",o:["Les cycles de vie du projet se situent sur un continuum allant du prédictif à l'adaptatif. Dans une approche prédictive, le périmètre est défini au début. Dans une approche adaptative, le périmètre est défini au début de chaque itération.","Les cycles de vie du projet se situent sur un continuum allant du prédictif à l'adaptatif. (Même énoncé - doublon pour test de lecture)","La prévention est préférable à l'inspection. Il est préférable d'intégrer la qualité dans les livrables.","La qualité et le grade sont des concepts différents. La qualité est le degré auquel un ensemble de caractéristiques satisfait aux exigences. Le grade est une catégorie attribuée aux livrables ayant le même usage fonctionnel mais des caractéristiques techniques différentes."],a:0,e:"L'option A décrit la gestion adaptative du PÉRIMÈTRE, pas le management de la qualité. La qualité comprend : prévention > inspection, qualité vs grade, amélioration continue, coût de la qualité."},
+{id:26,d:"Ressources",t:"Le Management des ressources du projet comprend tous les éléments suivants, SAUF :",o:["Le chef de projet doit être à la fois le leader et le gestionnaire de l'équipe projet, et doit fournir les efforts nécessaires pour acquérir, gérer, motiver et responsabiliser les membres de l'équipe.","Le chef de projet est responsable du développement proactif des compétences et aptitudes de l'équipe tout en maintenant et en améliorant la satisfaction et la motivation de l'équipe.","Des efforts sont nécessaires pour éviter les malentendus et les problèmes de communication, et les méthodes, les messagers et les messages doivent être soigneusement sélectionnés.","Le chef de projet doit être conscient des influences exercées sur l'équipe, telles que l'environnement de l'équipe, la localisation géographique des membres de l'équipe, la communication entre les parties prenantes."],a:2,e:"L'option C décrit des principes du Management des COMMUNICATIONS (sélectionner soigneusement méthodes, messagers et messages pour éviter les malentendus), pas des ressources."},
+{id:27,d:"Communications",t:"Le Management des communications du projet comprend tous les éléments suivants, SAUF :",o:["La communication peut être dirigée vers le haut à destination des parties prenantes de la direction, vers le bas à destination des membres de l'équipe ou horizontalement vers les pairs.","Le management des ressources physiques se concentre sur l'allocation et l'utilisation des ressources physiques nécessaires à l'achèvement réussi du projet.","Les activités de communication comprennent des communications internes et externes, formelles et informelles, écrites et orales.","Une communication efficace crée un pont entre des parties prenantes diverses dont les différences auront généralement un impact ou une influence sur l'exécution ou les résultats du projet."],a:1,e:"L'option B décrit le management des RESSOURCES PHYSIQUES, un concept du domaine Ressources, pas Communications."},
+{id:28,d:"Risques",t:"Le Management des risques du projet comprend tous les éléments suivants, SAUF :",o:["Le Management des risques du projet vise à identifier et gérer les risques qui ne sont pas couverts par les autres processus de management de projet.","Le risque existe à deux niveaux dans chaque projet : le risque individuel et le risque global du projet.","Ignorer le risque global du projet pour se concentrer uniquement sur les risques spécifiques du projet, car cela suffira à gérer le risque global du projet.","Tous les projets comportent des risques. Les organisations choisissent de prendre des risques de projet afin de créer de la valeur tout en équilibrant risque et récompense."],a:2,e:"Ignorer le risque global est une mauvaise pratique. Le PMBOK insiste sur la gestion des deux niveaux : risques individuels ET risque global du projet. On ne peut pas gérer le global en s'occupant uniquement des spécifiques."},
+{id:29,d:"Approvisionnements",t:"Le Management des approvisionnements du projet comprend tous les éléments suivants, SAUF :",o:["Les accords doivent être conformes aux lois locales, nationales et internationales relatives aux contrats.","Les approvisionnements impliquent des accords décrivant la relation entre un acheteur et un vendeur.","Tous les projets comportent des risques. Les organisations choisissent de prendre des risques de projet afin de créer de la valeur tout en équilibrant risque et récompense.","Le chef de projet doit s'assurer que tous les approvisionnements répondent aux besoins spécifiques du projet tout en travaillant avec les spécialistes des approvisionnements."],a:2,e:"L'option C est un principe du Management des RISQUES, pas des approvisionnements. Elle parle des risques organisationnels, un concept étranger à ce domaine de connaissance."},
+{id:30,d:"Parties Prenantes",t:"Le Management des parties prenantes du projet comprend tous les éléments suivants, SAUF :",o:["Afin d'augmenter les chances de succès, le processus d'identification et d'engagement des parties prenantes doit commencer dès que possible après l'approbation de la charte du projet.","La clé d'un engagement efficace des parties prenantes réside dans une communication continue avec toutes les parties prenantes.","Le processus d'identification et d'engagement des parties prenantes au bénéfice du projet est itératif et doit être revu et mis à jour régulièrement.","Le management des ressources physiques se concentre sur l'allocation et l'utilisation des ressources physiques nécessaires à l'achèvement réussi du projet."],a:3,e:"L'option D décrit le management des RESSOURCES PHYSIQUES, pas le management des parties prenantes. C'est un concept du domaine Ressources."},
+{id:31,d:"Adaptation",t:"Lors de l'adaptation des processus du Management de l'échéancier du projet, vous devez prendre en compte tous les éléments suivants, SAUF :",o:["Le management des connaissances.","L'approche du cycle de vie.","La gouvernance.","Les dimensions du projet."],a:0,e:"Le management des connaissances est une considération d'adaptation pour le Management de l'INTÉGRATION (Gérer les connaissances du projet), pas de l'échéancier. L'adaptation de l'échéancier tient compte de l'approche du cycle de vie, de la gouvernance et des dimensions du projet."},
+{id:32,d:"Adaptation",t:"Lors de l'adaptation des processus du Management de la qualité du projet, vous devez prendre en compte tous les éléments suivants, SAUF :",o:["Les normes et la conformité réglementaire.","L'engagement des parties prenantes.","La conformité aux politiques et les audits.","La complexité du projet, l'incertitude et la nouveauté du produit."],a:3,e:"La complexité du projet, l'incertitude et la nouveauté du produit sont des considérations d'adaptation pour les RISQUES, pas spécifiquement pour la qualité. L'adaptation de la qualité concerne : normes réglementaires, engagement des parties prenantes, politiques et audits."},
+{id:33,d:"Adaptation",t:"Lors de l'adaptation des processus du Management des ressources du projet, vous devez prendre en compte tous les éléments suivants, SAUF :",o:["La localisation physique.","L'approche du cycle de vie.","La diversité.","Le nombre de membres de l'équipe."],a:3,e:"Le nombre de membres de l'équipe n'est pas une considération d'adaptation spécifique listée dans le PMBOK pour les ressources. Les considérations d'adaptation des ressources incluent : localisation physique, approche du cycle de vie, diversité, culture."},
+{id:34,d:"Adaptation",t:"Lors de l'adaptation des processus du Management des risques du projet, vous devez prendre en compte tous les éléments suivants, SAUF :",o:["La complexité du projet.","L'importance du projet.","La taille du projet.","La durée du projet."],a:3,e:"La durée du projet n'est pas une considération d'adaptation principale pour les risques dans le PMBOK. Les considérations de risques incluent : complexité, importance, taille du projet et contexte organisationnel."},
+{id:35,d:"Adaptation",t:"Lors de l'adaptation des processus du Management des parties prenantes du projet, vous devez prendre en compte tous les éléments suivants, SAUF :",o:["L'engagement des parties prenantes.","La diversité des parties prenantes.","La complexité technologique.","La complexité des relations entre les parties prenantes."],a:0,e:"L'engagement des parties prenantes est un OBJECTIF du management des parties prenantes, pas une considération d'adaptation. Les considérations d'adaptation incluent : diversité des parties prenantes, complexité technologique, complexité des relations."},
+{id:36,d:"Adaptation",t:"Lors de l'adaptation des processus du Management des coûts du projet, vous devez prendre en compte tous les éléments suivants, SAUF :",o:["L'amélioration continue.","Le management de la valeur acquise.","L'estimation et la budgétisation.","La gouvernance."],a:0,e:"L'amélioration continue est un principe du Management de la QUALITÉ (PDCA). Les considérations d'adaptation des coûts sont : management de la valeur acquise, estimation et budgétisation, gouvernance financière."},
+{id:37,d:"Ressources",t:"Les types et les quantités de ressources nécessaires pour chaque activité d'un lot de travaux.",o:["Exigences en ressources.","Ensemble de ressources.","Structure de découpage des ressources.","Organigramme."],a:0,e:"La définition PMBOK des 'Exigences en ressources' : les types et quantités de ressources nécessaires pour chaque activité d'un lot de travaux. C'est l'extrant du processus 'Estimer les ressources nécessaires aux activités'."},
+{id:38,d:"Agile/Adaptatif",t:"Un cycle de vie du projet qui est itératif ou incrémental.",o:["Cycle de vie adaptatif.","Développement progressif.","Cascade.","Cycle de vie prédictif."],a:0,e:"Le cycle de vie ADAPTATIF est défini comme itératif ou incrémental. Il s'oppose au cycle de vie prédictif (en cascade) où tout est planifié à l'avance."},
+{id:39,d:"Échéancier",t:"Tom, chef de projet d'un important projet de défense, utilise une technique pour estimer la durée d'une activité de son projet à partir de données historiques provenant d'une activité ou d'un projet similaire :",o:["Estimation ascendante.","Estimation paramétrique.","Estimation descendante.","Estimation analogue."],a:3,e:"L'estimation analogue (analogique) utilise les données historiques d'activités ou projets similaires pour estimer la durée ou le coût. C'est une technique top-down, rapide mais moins précise."},
+{id:40,d:"Périmètre",t:"Dawn est chef de projet dans le cadre d'un lancement de produit réussi dans la Silicon Valley. Au cours du processus de planification, elle rencontre souvent des facteurs considérés comme vrais, réels ou certains, sans preuve ni démonstration. Ceux-ci sont appelés :",o:["Hypothèses.","Contraintes.","Dépendances.","Avances et retards."],a:0,e:"Les HYPOTHÈSES sont des facteurs considérés comme vrais, réels ou certains sans preuve ni démonstration. Elles doivent être documentées et vérifiées tout au long du projet."},
+{id:41,d:"Coûts",t:"Pour les petits projets, quel document de support peut être utilisé pour appuyer les détails utilisés dans l'établissement des estimations du projet, tels que les hypothèses, les contraintes, le niveau de détail, les fourchettes et les niveaux de confiance ?",o:["Base des estimations","Estimations de durée","Estimations des coûts","Estimations des ressources"],a:0,e:"La Base des estimations est le document qui décrit les détails utilisés pour établir les estimations : hypothèses, contraintes, niveau de détail, fourchettes et niveaux de confiance. C'est le document de justification des estimations."},
+{id:42,d:"Intégration",t:"Une étude documentée de faisabilité économique utilisée pour établir la validité des bénéfices d'un composant sélectionné ne disposant pas encore d'une définition suffisante, et servant de base à l'autorisation d'activités supplémentaires de management de projet.",o:["Analyse de rentabilité","Besoin métier","Étude de cas","Réalisation des bénéfices"],a:0,e:"L'Analyse de rentabilité (Business Case) est exactement cette étude documentée de faisabilité économique qui établit la validité des bénéfices et sert de base à l'autorisation du projet."},
+{id:43,d:"Qualité",t:"Une technique permettant de revoir systématiquement des éléments à l'aide d'une liste afin d'en vérifier l'exactitude et l'exhaustivité :",o:["Analyse des hypothèses","Analyse par liste de contrôle","Analyse des diagrammes de flux","Analyse des contraintes"],a:1,e:"L'analyse par liste de contrôle (checklist analysis) est une technique qui utilise des listes prédéfinies pour revoir systématiquement des éléments et vérifier leur exactitude et exhaustivité."},
+{id:44,d:"Communications",t:"Une technique analytique permettant de déterminer les besoins en information des parties prenantes du projet au moyen d'entretiens, d'ateliers, de l'étude des leçons apprises de projets précédents, etc.",o:["Système de gestion de l'information","Système d'information de management de projet","Technologie des exigences de communication","Analyse des besoins en communication"],a:3,e:"L'Analyse des besoins en communication est la technique qui détermine les besoins en information des parties prenantes via entretiens, ateliers, leçons apprises, etc."},
+{id:45,d:"Risques",t:"Temps ou argent alloué dans l'échéancier ou la référence de base des coûts pour les risques connus disposant de stratégies de réponse actives.",o:["Réserve de management","Réserve descendante","Réserve pour aléas","Réserve d'allocation des risques"],a:2,e:"La Réserve pour aléas (contingency reserve) est allouée pour les risques CONNUS (identifiés) avec stratégies de réponse actives. La réserve de management couvre les risques INCONNUS."},
+{id:46,d:"Qualité",t:"Tous les coûts engagés tout au long du cycle de vie du produit en raison des investissements destinés à prévenir la non-conformité aux exigences, à évaluer la conformité du produit ou du service aux exigences, ainsi qu'à corriger les défauts dus au non-respect des exigences.",o:["Coût total","Coût des erreurs","Coût de la qualité","Budget à l'achèvement"],a:2,e:"Le Coût de la qualité (CoQ) englobe tous les coûts engagés pour : prévenir la non-conformité, évaluer la conformité et corriger les défauts. Il comprend les coûts de conformité et de non-conformité."},
+{id:47,d:"Échéancier",t:"Toute activité située sur le chemin critique dans l'échéancier du projet.",o:["Activité avec marge négative","Activité de la chaîne critique","Activité du chemin critique","Activité avec marge positive"],a:2,e:"Une activité du chemin critique est toute activité se trouvant sur le chemin critique — elle a une marge totale nulle (ou minimale) et tout retard sur elle retarderait le projet."},
+{id:48,d:"Échéancier",t:"La quantité de temps pendant laquelle une activité de l'échéancier peut être retardée ou prolongée à partir de sa date de début au plus tôt sans retarder la date de fin du projet ni enfreindre une contrainte d'échéancier.",o:["Marge négative","Marge totale","Décalage libre","Marge libre"],a:1,e:"La Marge Totale (Total Float) est le temps pendant lequel une activité peut être retardée sans retarder la date de fin du projet. La Marge libre (Free Float) est le temps sans retarder l'activité suivante."},
+{id:49,d:"Agile/Adaptatif",t:"Un cycle de vie de projet adaptatif dans lequel le livrable est produit au travers d'une série d'itérations ajoutant successivement des fonctionnalités dans un délai prédéfini. Le livrable contient les capacités nécessaires et suffisantes pour être considéré comme achevé uniquement après la dernière itération.",o:["Cycle de vie du programme","Cycle de vie en cascade","Cycle de vie du chemin critique","Cycle de vie incrémental"],a:3,e:"Le Cycle de vie incrémental : livrable produit par itérations successives, chaque itération ajoutant des fonctionnalités, le livrable final n'étant complet qu'après la DERNIÈRE itération."},
+{id:50,d:"Agile/Adaptatif",t:"Un cycle de vie de projet adaptatif dans lequel le livrable mûrit au travers d'une série de cycles répétés. Le livrable contient les capacités nécessaires et suffisantes pour être considéré comme achevé à la fin de chaque cycle. Chaque cycle répété améliore davantage les capacités du livrable.",o:["Cycle de vie du produit","Cycle de vie du projet","Cycle de vie itératif","Cycle de vie de l'analyse métier"],a:2,e:"Le Cycle de vie itératif : le livrable est complet à la FIN DE CHAQUE CYCLE et s'améliore à chaque répétition. À distinguer de l'incrémental où le livrable n'est complet qu'après la dernière itération."},
+{id:51,d:"Agile/Adaptatif",t:"Une forme de cycle de vie de projet dans laquelle le périmètre, les délais et les coûts du projet sont déterminés dès les premières phases du cycle de vie.",o:["Cycle de vie prédictif","Cycle de vie du produit","Cycle de vie adaptatif","Cycle de vie du programme"],a:0,e:"Le Cycle de vie prédictif (en cascade) détermine le périmètre, les délais et les coûts DÈS LE DÉBUT. Tout est planifié à l'avance — c'est la caractéristique fondamentale de cette approche."},
+{id:52,d:"Intégration",t:"Processus itératif consistant à augmenter le niveau de détail d'un plan de management du projet à mesure que davantage d'informations et des estimations plus précises deviennent disponibles.",o:["Diagramme de Gantt","Échéancier en cascade","Échéancier sommaire","Élaboration progressive"],a:3,e:"L'Élaboration progressive est le processus itératif d'augmentation du niveau de détail du plan de management du projet à mesure que les informations et estimations s'améliorent."},
+{id:53,d:"Qualité",t:"Laquelle des propositions ci-dessous représente la MEILLEURE définition des audits qualité ?",o:["Un audit qualité est un processus structuré et indépendant visant à déterminer si les activités du projet sont conformes aux politiques, processus et procédures de l'organisation et du projet.","Un document du projet comprenant les problèmes liés au management de la qualité, les recommandations d'actions correctives et un résumé des constatations issues des activités de contrôle qualité.","Une politique spécifique au domaine de connaissances du management de la qualité du projet, établissant les principes fondamentaux devant guider les actions de l'organisation.","Une description d'un attribut du projet ou du produit ainsi que de la manière de le mesurer."],a:0,e:"L'audit qualité est un processus STRUCTURÉ et INDÉPENDANT qui vérifie si les activités du projet sont conformes aux politiques, processus et procédures organisationnels. C'est la définition PMBOK officielle."},
+{id:54,d:"Ressources",t:"Laquelle des propositions ci-dessous représente la MEILLEURE définition d'une matrice RACI ?",o:["Un type courant de matrice d'attribution des responsabilités utilisant les statuts Responsable, Approbateur, Consulté et Informé pour définir l'implication des parties prenantes dans les activités du projet.","Un calendrier identifiant les jours ouvrés et les horaires pendant lesquels chaque ressource spécifique est disponible.","Un diagramme à barres montrant la quantité de temps pendant laquelle une ressource est planifiée pour travailler sur une série de périodes.","Une représentation hiérarchique des ressources par catégorie et par type."],a:0,e:"La matrice RACI = Responsable, Approbateur (Accountable), Consulté, Informé. C'est un type de Matrice d'Attribution des Responsabilités (RAM) qui définit clairement l'implication de chaque partie prenante."},
+{id:55,d:"Périmètre",t:"Quelle est la MEILLEURE façon de décrire la documentation des exigences ?",o:["Un composant du plan de management du programme ou du projet décrivant comment les exigences seront analysées, documentées et gérées.","Une description de la manière dont chaque exigence répond au besoin métier du projet.","Une condition ou une capacité devant être présente dans un produit, un service ou un résultat afin de satisfaire un besoin métier.","Une matrice reliant les exigences du produit à leur origine et aux livrables qui y répondent."],a:1,e:"La documentation des exigences décrit comment chaque exigence répond aux besoins métier du projet — elle établit la traçabilité entre les exigences et les besoins. L'option A décrit le PLAN de management des exigences."},
+{id:56,d:"Risques",t:"Quelle est la MEILLEURE définition du risque résiduel ?",o:["Le risque qui subsiste après la mise en œuvre des réponses aux risques.","Une stratégie de réponse aux risques par laquelle l'équipe projet agit afin d'éliminer la menace ou de protéger le projet contre son impact.","Le degré d'incertitude qu'une organisation ou un individu est disposé à accepter dans l'espoir d'une récompense.","Une stratégie de réponse aux risques par laquelle l'équipe projet décide de reconnaître le risque et de ne prendre aucune mesure tant que le risque ne se produit pas."],a:0,e:"Le Risque résiduel est le risque qui SUBSISTE après la mise en œuvre des réponses aux risques. Il faut le surveiller et prévoir des réserves pour aléas pour y faire face."},
+{id:57,d:"Ressources",t:"Laquelle des propositions ci-dessous représente la MEILLEURE définition du nivellement des ressources ?",o:["Une technique d'optimisation des ressources dans laquelle des ajustements sont apportés à l'échéancier du projet afin d'optimiser l'allocation des ressources et pouvant affecter le chemin critique.","Un diagramme à barres montrant la quantité de temps pendant laquelle une ressource est planifiée pour travailler sur une série de périodes.","Les types et quantités de ressources nécessaires pour chaque activité d'un lot de travaux.","Une représentation hiérarchique des ressources par catégorie et par type."],a:0,e:"Le Nivellement des ressources est une technique d'optimisation qui ajuste l'échéancier pour équilibrer l'utilisation des ressources. Il peut ALLONGER l'échéancier et affecter le chemin critique."},
+{id:58,d:"Échéancier",t:"Quelle définition décrit le MIEUX la planification en vagues successives ?",o:["Une matrice montrant les ressources du projet affectées à chaque lot de travaux.","Un composant du plan de management du projet ou du programme établissant les critères et les activités de développement, de suivi et de contrôle de l'échéancier.","Une technique de planification itérative dans laquelle le travail à accomplir à court terme est planifié en détail, tandis que le travail futur est planifié à un niveau plus élevé.","Une technique permettant d'identifier les dates de début et de fin au plus tôt et au plus tard pour les parties non achevées des activités du projet."],a:2,e:"La planification en vagues successives (Rolling Wave Planning) : travail immédiat planifié en DÉTAIL, travail futur planifié à haut niveau. Le niveau de détail s'accroît au fur et à mesure que le projet avance."},
+{id:59,d:"Coûts",t:"Quelle est la définition de la référence de base des coûts ?",o:["Une mesure de l'efficacité des coûts des ressources budgétées exprimée comme le ratio entre la valeur acquise et le coût réel.","La version approuvée du budget du projet réparti dans le temps, excluant toute réserve de management, qui ne peut être modifiée qu'au moyen de procédures formelles de contrôle des changements et qui sert de base de comparaison avec les résultats réels.","Un outil d'analyse financière utilisé pour déterminer les bénéfices générés par un projet par rapport à ses coûts.","Le montant du déficit ou de l'excédent budgétaire à un moment donné, exprimé comme la différence entre la valeur acquise et le coût réel."],a:1,e:"La référence de base des coûts (Cost Baseline) = version approuvée du budget réparti dans le temps, EXCLUANT les réserves de management, modifiable uniquement via contrôle formel des changements."},
+{id:60,d:"Périmètre",t:"Quelle est la MEILLEURE description de la référence de base du périmètre ?",o:["La version approuvée de l'énoncé du périmètre, de la structure de découpage du projet et de son dictionnaire associé, qui peut être modifiée au moyen de procédures formelles de contrôle des changements et qui sert de base de comparaison avec les résultats réels.","La somme des produits, services et résultats devant être fournis dans le cadre du projet.","Un composant du plan de management du programme ou du projet décrivant comment le périmètre sera défini, élaboré, surveillé, maîtrisé et validé.","L'expansion non maîtrisée du périmètre du produit ou du projet sans ajustement des délais, des coûts et des ressources."],a:0,e:"La référence de base du périmètre = énoncé du périmètre + WBS + dictionnaire de la WBS, dans leur version approuvée. C'est la base de comparaison pour les résultats réels."},
+{id:61,d:"Approvisionnements",t:"Quelle expression décrit le MIEUX les critères de sélection des sources ?",o:["Une description narrative des produits, services ou résultats à fournir par le projet.","Un ensemble d'attributs souhaités par l'acheteur auxquels un vendeur doit satisfaire ou qu'il doit dépasser afin d'être sélectionné pour un contrat.","Un document du projet comprenant l'identification, l'évaluation et la classification des parties prenantes du projet.","Une technique de collecte et d'analyse systématique d'informations quantitatives et qualitatives afin de déterminer les intérêts à prendre en compte tout au long du projet."],a:1,e:"Les critères de sélection des sources = ensemble d'attributs que l'acheteur souhaite et auxquels le vendeur doit satisfaire ou dépasser pour être sélectionné. Ils peuvent inclure : capacité technique, prix, expérience, références."},
+{id:62,d:"Périmètre",t:"Comment définiriez-vous l'énoncé des travaux ?",o:["L'expansion non maîtrisée du périmètre du produit ou du projet sans ajustement des délais, des coûts et des ressources.","Les réponses formelles des vendeurs à une demande de proposition ou à tout autre document d'approvisionnement précisant le prix, les conditions commerciales et les spécifications techniques.","Une description narrative des produits, services ou résultats devant être fournis par le projet.","La version approuvée de l'énoncé du périmètre, de la structure de découpage du projet et de son dictionnaire associé."],a:2,e:"L'énoncé des travaux (Statement of Work - SOW) est une description NARRATIVE des produits, services ou résultats devant être fournis par le projet. C'est un intrant pour l'élaboration de la charte du projet."},
+{id:63,d:"Intégration",t:"Quelle affirmation ci-dessous décrit le MIEUX l'adaptation ?",o:["Des documents du projet décrivant les activités utilisées pour déterminer si le produit atteint les objectifs qualité définis dans le plan de management de la qualité.","Un composant du plan de management des ressources décrivant quand et comment les membres de l'équipe seront acquis ainsi que la durée pendant laquelle ils seront nécessaires.","Un document partiellement complété dans un format prédéfini fournissant une structure définie pour collecter, organiser et présenter les informations et les données.","La détermination de la combinaison appropriée de processus, d'entrées, d'outils, de techniques, de sorties et de phases du cycle de vie afin de gérer un projet."],a:3,e:"L'adaptation = déterminer la COMBINAISON APPROPRIÉE de processus, intrants, outils, techniques, extrants et phases du cycle de vie pour gérer un projet spécifique. C'est l'essence de l'adaptation dans le PMBOK."},
+{id:64,d:"Qualité",t:"Sélectionnez la réponse qui décrit le MIEUX les documents de test et d'évaluation :",o:["Des documents du projet décrivant les activités utilisées pour déterminer si le produit atteint les objectifs qualité définis dans le plan de management de la qualité.","Des documents du projet décrivant les activités utilisées pour déterminer si le produit atteint les objectifs qualité (identique à A — doublon dans l'examen original).","Une activité dépendante qui suit logiquement une autre activité dans un échéancier.","La détermination de la combinaison appropriée de processus pour gérer un projet."],a:0,e:"Les documents de test et d'évaluation décrivent les activités utilisées pour déterminer si le produit ATTEINT les objectifs qualité définis dans le plan de management de la qualité."},
+{id:65,d:"Périmètre",t:"Qu'est-ce qu'une structure de découpage du projet ?",o:["Un contrat entre un fournisseur de services et l'utilisateur final définissant le niveau de service attendu du fournisseur.","L'ensemble des produits, services et résultats devant être fournis dans le cadre du projet.","La version approuvée de l'énoncé du périmètre, de la structure de découpage du projet et de son dictionnaire associé.","Une décomposition hiérarchique de la totalité du périmètre du travail devant être exécuté par l'équipe projet afin d'atteindre les objectifs du projet et de créer les livrables requis."],a:3,e:"La WBS (Work Breakdown Structure) = décomposition HIÉRARCHIQUE de la TOTALITÉ du périmètre du travail pour atteindre les objectifs du projet et créer les livrables. C'est la définition PMBOK officielle."},
+{id:66,d:"Périmètre",t:"Quelle est la MEILLEURE définition pour décrire un lot de travaux ?",o:["Un composant du plan de management du projet ou du programme décrivant comment le périmètre sera défini, élaboré, surveillé, maîtrisé et validé.","La version approuvée de l'énoncé du périmètre, de la structure de découpage du projet et de son dictionnaire associé.","L'expansion non maîtrisée du périmètre du produit ou du projet sans ajustement des délais, des coûts et des ressources.","Le travail défini au niveau le plus bas de la structure de découpage du projet pour lequel les coûts et les durées sont estimés et gérés."],a:3,e:"Le Lot de travaux (Work Package) = travail au niveau le plus BAS de la WBS pour lequel les coûts et durées sont estimés et gérés. C'est l'unité de base de la WBS."},
+{id:67,d:"Coûts",t:"Quel est le principal risque lors de l'inclusion de réserves ou de provisions pour imprévus dans votre estimation des coûts ?",o:["Sous-estimer l'estimation des coûts","Assurer le suivi des fonds","Annuler votre projet","Surestimer l'estimation des coûts"],a:3,e:"Le principal risque d'inclure des réserves dans les estimations est de SURESTIMER les coûts, ce qui peut rendre le projet moins compétitif ou allouer inutilement des ressources financières."},
+{id:68,d:"Intégration",t:"Laquelle des affirmations suivantes décrit le plus précisément un scénario de projet ?",o:["Les modifications du périmètre du projet durant les premières phases du projet sont très coûteuses.","La phase suivante d'un projet ne devrait jamais commencer avant que les livrables de la phase précédente ne soient complètement examinés et approuvés.","L'influence des parties prenantes reste la même tout au long du projet.","Les effectifs atteignent leur maximum pendant la phase d'exécution du projet."],a:3,e:"Dans tout projet, les effectifs (ressources humaines affectées) atteignent leur MAXIMUM pendant la phase d'EXÉCUTION. En démarrage et clôture, les effectifs sont réduits."},
+{id:69,d:"Ressources",t:"Lequel des éléments suivants n'est pas un actif organisationnel des processus utilisé pendant le processus Planifier le management des ressources ?",o:["Modèle de plan de management des ressources","Informations historiques sur les projets précédents","Liste standardisée des parties prenantes","Politiques et procédures de management des ressources"],a:2,e:"La liste standardisée des parties prenantes est un actif organisationnel du management des PARTIES PRENANTES, pas des ressources. Les actifs pour planifier les ressources incluent : modèles, historique de projets, politiques RH."},
+{id:70,d:"Parties Prenantes",t:"Pendant le processus Gérer l'engagement des parties prenantes, plusieurs documents du projet peuvent être mis à jour. Lequel des documents suivants est le plus souvent mis à jour pendant ce processus ?",o:["Rapports du projet","Présentations du projet","Registre des parties prenantes","Registre des risques"],a:2,e:"Le Registre des parties prenantes est le document le plus fréquemment mis à jour pendant 'Gérer l'engagement des parties prenantes', car les informations sur leur engagement, attentes et niveau d'intérêt évoluent."},
+{id:71,d:"Intégration",t:"Peu de chefs de projet collectent les informations relatives aux leçons apprises tout au long de la vie du projet. La plupart s'en occupent dans les derniers jours du projet ou, pire encore, après la clôture du projet. Quelle est la conséquence négative de cette approche ?",o:["Elle nécessite l'embauche d'un spécialiste pour effectuer ce travail.","Elle peut entraîner des dépenses supplémentaires pour le projet.","La VAN du projet devient nulle.","Elle rend difficile la compilation et l'obtention des informations du projet."],a:3,e:"Collecter les leçons apprises tardivement rend difficile la compilation et l'obtention des informations — les détails sont oubliés, les membres de l'équipe peuvent avoir quitté le projet, et la pertinence diminue."},
+{id:72,d:"Risques",t:"Après une séance de brainstorming sur les risques potentiels du projet, quelle est la méthode recommandée pour hiérarchiser ces risques et leurs plans d'atténuation ?",o:["Carte de contrôle","Diagramme d'Ishikawa","Matrice de probabilité et d'impact","Matrice RACI"],a:2,e:"La Matrice de probabilité et d'impact est l'outil standard pour hiérarchiser les risques après identification. Elle classe les risques selon leur probabilité d'occurrence et leur impact potentiel sur les objectifs du projet."},
+{id:73,d:"Coûts",t:"Si vous gérez les modifications de la référence de base des coûts du projet, quel processus utilisez-vous ?",o:["Déterminer le budget","Maîtriser les coûts","Estimer les coûts","Négocier les coûts"],a:1,e:"'Maîtriser les coûts' est le processus qui surveille l'état du projet pour mettre à jour les coûts et GÉRER LES MODIFICATIONS de la référence de base des coûts. C'est le processus de contrôle."},
+{id:74,d:"Approvisionnements",t:"Pendant le processus Maîtriser les approvisionnements, plusieurs documents peuvent être mis à jour. Lequel des composants suivants du plan de management du projet est le moins susceptible d'être mis à jour pendant ce processus ?",o:["Plan de management de la qualité","Référence de base des coûts","Plan de management des approvisionnements","Référence de base de l'échéancier"],a:0,e:"Le Plan de management de la qualité est le MOINS susceptible d'être mis à jour lors de 'Maîtriser les approvisionnements' — ce processus concerne principalement les contrats, coûts et échéanciers, pas les critères qualité."},
+{id:75,d:"Intégration",t:"Afin de faciliter la gestion de la configuration et des modifications dans les projets complexes, un chef de projet s'appuie sur des outils de gestion de la configuration et des modifications. Ces outils :",o:["La maîtrise des modifications doit être manuelle, mais la maîtrise de la configuration peut être automatique.","Doivent être automatiques ; un projet complexe nécessite des procédures complexes de maîtrise des modifications.","Peuvent être manuels ou automatiques ; le choix dépend de l'environnement et des exigences du projet.","Doivent être manuels ; un projet complexe exige que toutes les demandes de modification soient signées manuellement."],a:2,e:"Les outils de gestion de la configuration et des modifications peuvent être MANUELS ou AUTOMATIQUES — le choix dépend de l'environnement du projet et de ses exigences spécifiques. Pas de règle absolue."},
+{id:76,d:"Périmètre",t:"L'une des responsabilités du chef de projet est d'identifier les principaux livrables du projet durant l'exercice de recueil des exigences. Où les principaux livrables du projet sont-ils documentés ?",o:["Plan de management du périmètre","Plan de management des exigences","Livrables acceptés","Énoncé du périmètre du projet"],a:3,e:"Les principaux livrables du projet sont documentés dans l'ÉNONCÉ DU PÉRIMÈTRE DU PROJET, qui décrit en détail le périmètre, les principaux livrables, les hypothèses et les contraintes."},
+{id:77,d:"Périmètre",t:"Le niveau le plus détaillé de l'organigramme des travaux du projet (WBS) est le :",o:["Compte de contrôle","Livrable accepté","Énoncé du périmètre","Lot de travaux"],a:3,e:"Le Lot de travaux (Work Package) est le niveau le plus BAS et le plus détaillé de la WBS. Il peut faire l'objet d'une planification, d'une estimation des coûts, d'un suivi et d'un contrôle."},
+{id:78,d:"Risques",t:"Lequel des éléments suivants constitue une représentation hiérarchique des risques du projet ?",o:["Catégories de risques","Registre des risques","Structure de découpage des risques","Atténuation des risques"],a:2,e:"La Structure de Découpage des Risques (RBS - Risk Breakdown Structure) est une REPRÉSENTATION HIÉRARCHIQUE des risques organisés par catégories. Elle aide à identifier et classer systématiquement les risques."},
+{id:79,d:"Coûts",t:"Si un investissement dans un projet génère un rendement annuel de 15 %, combien devez-vous investir pour obtenir 5 millions de dollars à la fin de la cinquième année ?",o:["2 857 143","2 485 884","2 685 292","2 501 376"],a:1,e:"VAN = 5 000 000 / (1+0,15)^5 = 5 000 000 / 2,01136 ≈ 2 485 884 $. Formule : VP = VF / (1+r)^n où VF=5M, r=15%, n=5 ans."},
+{id:80,d:"Intégration",t:"Une entreprise envisage plus d'une douzaine de projets de modernisation d'infrastructure. Ces projets amélioreront la performance globale mais ne contribueront à aucun flux de revenus. Lequel des éléments suivants est le plus important dans un tel scénario ?",o:["Alignement avec les objectifs stratégiques","Besoin d'investissement","Valeur actuelle nette des projets","Taux de rentabilité interne des projets"],a:0,e:"Pour des projets sans flux de revenus, l'ALIGNEMENT AVEC LES OBJECTIFS STRATÉGIQUES est le critère le plus important. La VAN et le TRI ne sont pas applicables sans revenus."},
+{id:81,d:"Approvisionnements",t:"Si un chef de projet estime qu'un sous-contrat particulier doit être résilié, lequel des éléments suivants peut fournir des indications sur la procédure de résiliation du contrat ?",o:["Les procédures de résiliation de contrat dans le plan de management des approvisionnements du projet","La clause de résiliation du sous-contrat spécifique","Les procédures de résiliation de contrat dans les actifs organisationnels des processus","Les procédures de maîtrise des changements dans le plan de management du projet"],a:1,e:"La CLAUSE DE RÉSILIATION du sous-contrat spécifique est la référence la plus directe et appropriée pour connaître les procédures de résiliation de ce contrat précis."},
+{id:82,d:"Échéancier",t:"Lequel des types de relations de dépendance suivants est le moins couramment utilisé dans la méthode des diagrammes de précédence ?",o:["Début à fin","Début à début","Fin à fin","Fin à début"],a:0,e:"La relation Début à fin (Start-to-Finish) est la MOINS COURANTE dans la PDM. La relation Fin à début (Finish-to-Start) est la plus utilisée (~90% des cas). Début à fin est rare et souvent remplacée par d'autres relations."},
+{id:83,d:"Ressources",t:"Un diagramme RACI est un exemple de :",o:["Organigramme","Matrice d'attribution des responsabilités","Réseau","Organigramme hiérarchique"],a:1,e:"Un diagramme RACI est un type spécifique de Matrice d'Attribution des Responsabilités (RAM - Responsibility Assignment Matrix). Il utilise les catégories R-A-C-I pour définir les rôles."},
+{id:84,d:"Coûts",t:"Si la valeur acquise totale actuelle (EV) d'un projet est de 100 000 $ et que le coût réel dépensé (AC) est de 95 000 $, quelle est la variance des coûts du projet ?",o:["La variance des coûts est de 1,05","La variance des coûts est de 5 000 $","La variance des coûts est de -5 000 $","La variance des coûts est de 0,95"],a:1,e:"CV (Cost Variance) = EV - AC = 100 000 - 95 000 = 5 000 $. CV POSITIF = en dessous du budget (favorable). L'IPC = EV/AC = 100000/95000 = 1,05 (c'est l'indice, pas la variance)."},
+{id:85,d:"Coûts",t:"L'IPC rapporté du projet est incorrect parce que l'avance de 1 million de dollars a été incluse dans la valeur acquise et que le coût des stocks présents sur le site a été exclu du coût réel. Dans ce scénario, l'IPC rapporté du projet est incorrect parce que :",o:["Le coût réel est sous-estimé.","La valeur acquise est surestimée.","La valeur acquise est surestimée et le coût réel est sous-estimé.","La valeur acquise et le coût réel sont tous deux surestimés."],a:2,e:"Double erreur : 1) L'avance incluse dans EV = EV SURESTIMÉE (travail non encore réalisé compté comme acquis). 2) Stocks exclus de AC = AC SOUS-ESTIMÉ. Les deux biais gonflent artificiellement l'IPC."},
+{id:86,d:"Communications",t:"Quelle est la séquence des étapes dans un modèle de communication de base ?",o:["Encoder -> Décoder -> Transmettre -> Accuser réception -> Retour d'information","Décoder -> Encoder -> Transmettre -> Accuser réception -> Retour d'information","Encoder -> Transmettre -> Décoder -> Retour d'information -> Accuser réception","Encoder -> Transmettre -> Décoder -> Accuser réception -> Retour d'information"],a:3,e:"Séquence correcte du modèle de communication PMBOK : Encoder → Transmettre → Décoder → Accuser réception → Retour d'information (feedback). L'émetteur encode, transmet via un canal, le récepteur décode, accuse réception et envoie un feedback."},
+{id:87,d:"Périmètre",t:"Un membre junior de l'équipe a contesté l'approche de management du projet puisque toutes les exigences identifiées durant le processus Recueillir les exigences n'ont pas été documentées dans l'énoncé du périmètre du projet. Vous êtes le chef de projet, que devez-vous faire en premier ?",o:["Accepter votre erreur et inclure les exigences oubliées.","Analyser l'objection et déterminer si les exigences ont été volontairement écartées durant le processus Définir le périmètre.","Retirer le membre junior de l'équipe, car il s'agit d'un problème disciplinaire.","Faire intervenir le sponsor du projet pour résoudre le problème."],a:1,e:"La première action est d'ANALYSER l'objection — certaines exigences peuvent avoir été volontairement exclues lors de 'Définir le périmètre' car non réalisables, hors périmètre ou de faible priorité. Il faut comprendre avant d'agir."},
+{id:88,d:"Intégration",t:"Le management des connaissances du projet concerne la gestion de quel type de connaissances du projet ?",o:["Les connaissances 'explicites', car elles peuvent être facilement codifiées","Les connaissances 'explicites' et 'tacites'","Les connaissances 'tacites', car elles sont difficiles à exprimer","Les connaissances 'tacites', car elles impliquent croyances, intuitions, expérience et savoir-faire"],a:1,e:"Le management des connaissances du projet gère LES DEUX types : connaissances EXPLICITES (documentées, codifiées) ET TACITES (expérience, savoir-faire, intuition). Le PMBOK 6e édition intègre un processus dédié : Gérer les connaissances du projet."},
+{id:89,d:"Intégration",t:"Jane examine actuellement une liste de propositions de projets. Tous les projets permettent d'atteindre certains objectifs stratégiques et leurs coûts sont connus. Cependant, Jane ne peut pas exécuter tous les projets en raison de limitations budgétaires. Comment Jane doit-elle déterminer quels projets exécuter cette année ?",o:["Sélectionner les projets qui maximisent les revenus de l'organisation","Sélectionner les projets à budget élevé et abandonner les projets à faible budget","Sélectionner les projets à faible budget et abandonner les projets à budget élevé","Sélectionner les projets à faible budget et abandonner les projets à budget élevé"],a:0,e:"Avec des contraintes budgétaires et des projets tous alignés stratégiquement, Jane doit MAXIMISER LA VALEUR — sélectionner les projets qui génèrent le plus de revenus/valeur pour l'organisation par rapport à leur coût."},
+{id:90,d:"Ressources",t:"Augmenter le nombre de ressources afin de compresser l'échéancier du projet ne réduit pas toujours la durée dans la même proportion. Dans les pires cas, trop de ressources affectées à une activité peuvent en réalité augmenter sa durée. Cela est dû à :",o:["Une diminution du budget des coûts","La coordination supplémentaire requise","Le risque supplémentaire introduit par la compression de l'échéancier","Le rapprochement des limites de financement"],a:1,e:"Trop de ressources augmentent la COORDINATION NÉCESSAIRE — réunions, communications, gestion des interdépendances. C'est la Loi de Brooks : 'Ajouter des ressources à un projet en retard le retarde encore plus.'"},
+{id:91,d:"Périmètre",t:"La matrice de traçabilité des exigences aide à assurer la traçabilité de tous les éléments suivants, sauf :",o:["Les exigences vers les risques du projet","Les exigences vers le périmètre du projet","Les exigences vers les objectifs du projet","Les exigences vers la stratégie de test"],a:0,e:"La matrice de traçabilité des exigences trace les liens entre : exigences et périmètre, objectifs, stratégie de test, WBS, livrables, etc. Elle ne trace PAS directement les exigences vers les risques du projet."},
+{id:92,d:"Périmètre",t:"Lequel des éléments suivants ne doit pas être utilisé comme entrée pour créer la structure WBS ?",o:["Documentation des exigences","Actifs organisationnels des processus","Nomenclature","Énoncé du périmètre du projet"],a:2,e:"La Nomenclature (BOM - Bill of Materials) est un document technique de gestion des composants/matériaux, pas un intrant PMBOK reconnu pour créer la WBS. Les intrants officiels sont : énoncé du périmètre, documentation des exigences, actifs organisationnels."},
+{id:93,d:"Intégration",t:"Lesquels des processus suivants sont généralement réalisés une seule fois ou à des moments prédéfinis du projet ?",o:["'Élaborer la charte du projet' et 'Clore le projet ou la phase'","'Diriger et gérer le travail du projet' et 'Surveiller et maîtriser le travail du projet'","'Élaborer le plan de management du projet' et 'Diriger et gérer le travail du projet'","'Élaborer la charte du projet' et 'Élaborer le plan de management du projet'"],a:0,e:"'Élaborer la charte du projet' (démarrage) et 'Clore le projet ou la phase' (clôture) sont réalisés UNE SEULE FOIS ou à des moments prédéfinis. Les autres processus sont itératifs ou continus."},
+{id:94,d:"Risques",t:"Quel terme décrit le mieux le processus Identifier les risques ?",o:["Sans conséquence","Redondant","Fini","Itératif"],a:3,e:"Le processus Identifier les risques est ITÉRATIF — il se répète tout au long du projet car de nouveaux risques peuvent émerger à mesure que le projet avance et que les informations deviennent plus précises."},
+{id:95,d:"Risques",t:"Durant le processus Planifier le management des risques, l'attribution de ______ aidera le chef de projet et l'équipe de projet à identifier tous les risques importants et à travailler plus efficacement durant le processus d'identification.",o:["Facteurs de risque","Plans d'atténuation des risques","Catégories de risques","Responsabilités"],a:2,e:"Les Catégories de risques (organisées dans la RBS) aident à identifier tous les risques importants en structurant la réflexion par thèmes. Elles assurent qu'aucune zone de risque n'est oubliée."},
+{id:96,d:"Échéancier",t:"Lequel de ces processus n'est pas un processus du management de l'échéancier du projet ?",o:["Séquencer les activités","Élaborer l'échéancier","Créer la WBS","Définir les activités"],a:2,e:"'Créer la WBS' est un processus du Management du PÉRIMÈTRE, pas de l'échéancier. Les 6 processus de l'échéancier : Planifier le management de l'échéancier, Définir les activités, Séquencer les activités, Estimer les durées, Élaborer l'échéancier, Maîtriser l'échéancier."},
+{id:97,d:"Échéancier",t:"La technique la plus couramment utilisée par les logiciels de management de projet pour construire un modèle d'échéancier de projet est :",o:["Activité sur nœud","Fin à début","Méthode des diagrammes de précédence","Nœud sur activité"],a:2,e:"La Méthode des Diagrammes de Précédence (PDM - Precedence Diagramming Method) est la technique standard utilisée par les logiciels de management de projet pour construire les modèles d'échéancier."},
+{id:98,d:"Périmètre",t:"Lequel des éléments suivants définit le périmètre total du projet et représente le travail spécifié dans l'énoncé du périmètre du projet actuellement approuvé ?",o:["Organigramme des risques (RBS)","Organigramme des travaux du projet (WBS)","Charte du projet","Nomenclature"],a:1,e:"La WBS (Work Breakdown Structure) définit et représente la TOTALITÉ du périmètre du travail approuvé. Elle décompose tout le travail nécessaire pour atteindre les objectifs du projet."},
+{id:99,d:"Périmètre",t:"Si vous créez une nouvelle WBS pour votre projet, que devez-vous faire afin de gagner du temps durant le processus de création ?",o:["Créer une WBS moins détaillée.","Déléguer la création de la WBS puisque ce n'est pas un processus important.","Utiliser comme modèle une WBS provenant d'un projet similaire précédent.","Ignorer le processus de création de la WBS."],a:2,e:"Utiliser une WBS MODÈLE d'un projet similaire précédent est la meilleure pratique pour gagner du temps. Les actifs organisationnels (modèles WBS) sont des intrants reconnus dans le PMBOK pour ce processus."},
+{id:100,d:"Échéancier",t:"Laquelle de ces relations de dépendance est la plus couramment utilisée dans la méthode des diagrammes de précédence ?",o:["Fin à début","Fin à fin","Début à fin","Début à début"],a:0,e:"La relation Fin à début (Finish-to-Start) est la PLUS COURANTE (~90% des utilisations) dans la PDM. Elle signifie que l'activité suivante ne peut commencer qu'après la fin de l'activité précédente."},
+{id:101,d:"Périmètre",t:"Le résultat du processus Valider le périmètre est constitué des livrables acceptés qui sont formellement approuvés par les parties prenantes. Les parties prenantes, sur certains projets, peuvent commencer à s'impliquer dans le projet dès :",o:["Le démarrage du projet","La planification du projet","L'exécution du projet","La surveillance et maîtrise du projet"],a:0,e:"Les parties prenantes peuvent commencer à s'impliquer dès le DÉMARRAGE du projet (élaboration de la charte, identification des parties prenantes). Plus tôt on les implique, plus leur influence sur le projet est positive."},
+{id:102,d:"Qualité",t:"Un audit qualité efficace doit être :",o:["Structuré et indépendant","Structuré et interne","Informel et indépendant","Informel et interne"],a:0,e:"Un audit qualité efficace doit être STRUCTURÉ (avec une approche méthodique et des critères définis) et INDÉPENDANT (réalisé par des personnes n'ayant pas de conflit d'intérêts avec le travail audité)."},
+{id:103,d:"Ressources",t:"Quelle est la manière traditionnelle de représenter une structure hiérarchique de reporting entre les membres de l'équipe de projet ?",o:["Organigramme","Matrice des responsabilités","Description des rôles orientée texte","Organigrammes du projet"],a:0,e:"L'Organigramme (Organization Chart / OBS) est la manière TRADITIONNELLE de représenter la structure hiérarchique de reporting entre les membres de l'équipe — avec des lignes de rapport et de hiérarchie."},
+{id:104,d:"Périmètre",t:"Kevin veut introduire un nouveau processus 'Identifier les livrables clés' dans les six processus existants du management du périmètre du projet. La meilleure position pour le nouveau processus 'Identifier les livrables clés' devrait se situer entre lesquels des processus suivants ?",o:["Planifier le management du périmètre et Recueillir les exigences","Créer la WBS et Valider le périmètre","Définir le périmètre et Créer la WBS","Recueillir les exigences et Définir le périmètre"],a:3,e:"Logiquement, identifier les livrables clés se fait après avoir RECUEILLI LES EXIGENCES (on sait ce que veut le client) et avant de DÉFINIR LE PÉRIMÈTRE (qui formalise ces livrables). Séquence : Recueillir exigences → Identifier livrables clés → Définir périmètre."},
+{id:105,d:"Risques",t:"Les risques du projet doivent être identifiés par :",o:["Tout le personnel du projet","Le chef de projet uniquement","Uniquement les personnes invitées au processus d'identification des risques","Les principales parties prenantes du projet uniquement"],a:0,e:"Les risques doivent être identifiés par TOUT LE PERSONNEL DU PROJET — chaque membre de l'équipe peut avoir une perspective unique sur les risques dans son domaine d'expertise. La participation large améliore l'exhaustivité de l'identification."}
+];
+// ════ STATE ════
+const S={mode:'exam',examIdx:0,questions:[],current:0,answers:{},startTime:null,timerInt:null,elapsed:0,modalMode:'exam',fcKnown:new Set(),fcFlipped:false,lastRes:null};
+function ld(){try{return JSON.parse(localStorage.getItem('pmp4')||'{}')}catch{return{}}}
+function sv(d){try{localStorage.setItem('pmp4',JSON.stringify(d))}catch{}}
+
+// ════ THEME ════
+function setTheme(n,el){document.documentElement.setAttribute('data-theme',n);document.querySelectorAll('.theme-option').forEach(o=>o.classList.remove('active'));if(el)el.classList.add('active');const d=ld();d.theme=n;sv(d);closeDrop();}
+function toggleThemeDrop(){document.getElementById('theme-drop').classList.toggle('open')}
+function closeDrop(){document.getElementById('theme-drop').classList.remove('open')}
+document.addEventListener('click',e=>{if(!e.target.closest('.theme-switcher'))closeDrop()});
+(function(){const d=ld();if(d.theme){document.documentElement.setAttribute('data-theme',d.theme);document.querySelectorAll('.theme-option').forEach(o=>{o.classList.toggle('active',o.getAttribute('data-theme')===d.theme)});}})();
+
+// ════ SCREENS ════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('active');
+  if(id==='home')refreshHome();if(id==='stats')refreshStats();
+}
+
+// ════ HOME ════
+function refreshHome(){
+  const d=ld(),h=d.history||[],sc=h.map(x=>x.pct);
+  document.getElementById('hs-total').textContent=h.length;
+  document.getElementById('hs-best').textContent=sc.length?Math.max(...sc)+'%':'—';
+  document.getElementById('hs-avg').textContent=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length)+'%':'—';
+  document.getElementById('hs-errors').textContent=(d.errors||[]).length;
+  for(let i=0;i<9;i++){
+    const s=(d.examScores||{})['e'+i];
+    const el=document.getElementById('escore-'+i);
+    const pe=document.getElementById('epct-'+i);
+    if(el){el.style.width=s?s+'%':'0%';}
+    if(pe){pe.textContent=s?s+'%':'—';}
+  }
+}
+
+// ════ MODAL ════
+function openExamModal(idx){
+  S.examIdx=idx;
+  const nm=['EB1 Partie 1 (Q1–35)','EB1 Partie 2 (Q36–70)','EB1 Partie 3 (Q71–105)','EB1 Complet (105 Q)',
+            'EB2 Partie 1 (Q1–35)','EB2 Partie 2 (Q36–70)','EB2 Partie 3 (Q71–105)','EB2 Complet (105 Q)',
+            'Grand Examen Final (210 Q)'];
+  document.getElementById('modal-title').textContent=nm[idx]||'Lancer l\'Examen';
+  S.modalMode='exam';
+  document.querySelectorAll('.modal-option').forEach((o,i)=>o.classList.toggle('selected',i===0));
+  document.getElementById('exam-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('exam-modal').classList.remove('open')}
+function pickMode(m,el){S.modalMode=m;document.querySelectorAll('.modal-option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected')}
+function launchExam(){
+  closeModal();
+  // idx 0-3 = EB1, 4-7 = EB2, 8 = Grand Final
+  let qs;
+  if(S.examIdx===0) qs=Q.slice(0,35);
+  else if(S.examIdx===1) qs=Q.slice(35,70);
+  else if(S.examIdx===2) qs=Q.slice(70,105);
+  else if(S.examIdx===3) qs=[...Q];
+  else if(S.examIdx===4) qs=Q2.slice(0,35);
+  else if(S.examIdx===5) qs=Q2.slice(35,70);
+  else if(S.examIdx===6) qs=Q2.slice(70,105);
+  else if(S.examIdx===7) qs=[...Q2];
+  else if(S.examIdx===8) qs=[...Q,...Q2];
+  if(document.getElementById('shuffle-ck').checked) qs=shuf(qs);
+  beginQuiz(S.modalMode,qs);
+}
+
+// ════ MODES ════
+function startMode(mode){
+  let qs;
+  if(mode==='errors'){
+    const d=ld();
+    const ei=new Set((d.errors||[]).map(e=>e.key||e));
+    qs=[...Q,...Q2].filter(q=>ei.has(q.id+'_'+getBankOf(q)));
+    if(!qs.length){toast('🎉 Aucune erreur enregistrée !');return;}
+    qs=shuf(qs);
+  } else if(mode==='rapid'){
+    const d=ld();const sc=d.qSc||{};
+    const all=shuf([...Q,...Q2]);
+    qs=all.sort((a,b)=>(sc[getKey(a)]??0.5)-(sc[getKey(b)]??0.5)).slice(0,25);
+  } else {
+    qs=shuf([...Q,...Q2]);
+  }
+  beginQuiz(mode,qs);
+}
+function getBankOf(q){return Q.some(x=>x.id===q.id&&x.t===q.t)?'eb1':'eb2';}
+function getKey(q){return q.id+'_'+getBankOf(q);}
+
+// ════ QUIZ ENGINE ════
+function beginQuiz(mode,questions){
+  S.mode=mode;S.questions=questions;S.current=0;S.answers={};S.elapsed=0;S.fcFlipped=false;S.fcKnown=new Set();
+  if(S.timerInt)clearInterval(S.timerInt);
+  S.startTime=Date.now();S.timerInt=setInterval(tickTimer,1000);
+  const ml={exam:'MODE EXAMEN',memo:'MÉMORISATION RAPIDE',flash:'MODE FLASHCARD',rapid:'RÉVISION EXPRESS',errors:'MES ERREURS'};
+  const en=['EB1·P1','EB1·P2','EB1·P3','EB1 Complet','EB2·P1','EB2·P2','EB2·P3','EB2 Complet','Grand Final 210 Q'];
+  document.getElementById('ql-mode').textContent=ml[mode]||mode.toUpperCase();
+  document.getElementById('ql-sub').textContent=(mode==='exam'?en[S.examIdx]:questions.length+' questions');
+  if(mode==='flash'){
+    document.getElementById('qcard-section').style.display='none';
+    document.getElementById('flash-section').style.display='block';
+    renderFC();
+  } else {
+    document.getElementById('qcard-section').style.display='block';
+    document.getElementById('flash-section').style.display='none';
+    renderQ();
+  }
+  showScreen('quiz');
+}
+
+function tickTimer(){
+  S.elapsed=Math.floor((Date.now()-S.startTime)/1000);
+  const h=Math.floor(S.elapsed/3600),m=Math.floor((S.elapsed%3600)/60),s=S.elapsed%60;
+  document.getElementById('timer-txt').textContent=h>0?`${h}:${z(m)}:${z(s)}`:`${z(m)}:${z(s)}`;
+  const t=document.getElementById('quiz-timer');t.className='quiz-timer';
+  if(S.elapsed>5400)t.classList.add('danger');else if(S.elapsed>3600)t.classList.add('warning');
+}
+function z(n){return n<10?'0'+n:n}
+
+function renderQ(){
+  const q=S.questions[S.current];if(!q)return;
+  const tot=S.questions.length;
+  document.getElementById('prog-fill').style.width=(S.current/tot*100)+'%';
+  document.getElementById('prog-txt').textContent=`Question ${S.current+1} sur ${tot}`;
+  document.getElementById('domain-badge').textContent=q.d;
+  document.getElementById('q-num').textContent=`Question ${q.id}`;
+  document.getElementById('q-text').textContent=q.t;
+  const L=['A','B','C','D'],key=getKey(q),answered=S.answers[key]!==undefined;
+  const c=document.getElementById('opts-container');c.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const div=document.createElement('div');
+    div.className='option'+(answered?' locked':'');
+    div.id='opt-'+i;
+    div.innerHTML=`<div class="opt-letter">${L[i]}</div><div class="opt-text">${opt}</div>`;
+    if(!answered)div.addEventListener('click',()=>selOpt(i));
+    c.appendChild(div);
+  });
+  document.getElementById('expl-box').classList.remove('show');
+  document.getElementById('expl-txt').textContent='';
+  const bn=document.getElementById('btn-next'),bp=document.getElementById('btn-prev');
+  bp.style.display=S.current>0?'inline-flex':'none';
+  bn.textContent=(S.current+1>=tot)?'✓ Terminer':'Valider →';
+  if(answered){bn.disabled=false;applyStyle(q,S.answers[key]);}
+  else bn.disabled=true;
+}
+
+function selOpt(idx){
+  const q=S.questions[S.current],key=getKey(q);
+  if(S.answers[key]!==undefined&&S.mode==='exam')return;
+  S.answers[key]=idx;
+  document.getElementById('btn-next').disabled=false;
+  if(S.mode==='exam'){
+    document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+    const el=document.getElementById('opt-'+idx);if(el)el.classList.add('selected');
+  } else {
+    applyStyle(q,idx);updQSc(key,idx===q.a);
+    document.getElementById('btn-next').textContent=(S.current+1>=S.questions.length)?'✓ Terminer':'Question suivante →';
+  }
+}
+
+function applyStyle(q,chosen){
+  q.o.forEach((_,i)=>{
+    const el=document.getElementById('opt-'+i);if(!el)return;
+    el.classList.add('locked');el.classList.remove('selected','correct','wrong');
+    if(i===q.a)el.classList.add('correct');
+    if(i===chosen&&chosen!==q.a)el.classList.add('wrong');
+  });
+  if(q.e){document.getElementById('expl-txt').textContent=q.e;document.getElementById('expl-box').classList.add('show');}
+}
+
+function updQSc(key,ok){
+  const d=ld();if(!d.qSc)d.qSc={};
+  d.qSc[key]=ok?Math.min(1,(d.qSc[key]??0.5)+0.15):Math.max(0,(d.qSc[key]??0.5)-0.2);
+  if(!d.errors)d.errors=[];
+  if(!ok&&!d.errors.includes(key))d.errors.push(key);
+  if(ok)d.errors=d.errors.filter(e=>e!==key);
+  sv(d);
+}
+
+function nextQ(){
+  const q=S.questions[S.current],key=getKey(q);
+  if(S.answers[key]===undefined)return;
+  if(S.mode==='exam')updQSc(key,S.answers[key]===q.a);
+  if(S.current+1>=S.questions.length){finishQuiz();return;}
+  S.current++;renderQ();
+}
+function prevQ(){if(S.current>0){S.current--;renderQ();}}
+function confirmQuit(){if(confirm('Quitter le quiz ? La progression en cours sera perdue.')){clearInterval(S.timerInt);showScreen('home');}}
+
+// ════ FLASHCARD ════
+function renderFC(){
+  const rem=S.questions.filter((_,i)=>!S.fcKnown.has(i));
+  if(!rem.length){
+    document.getElementById('fc-q').textContent='🎉 Toutes les flashcards maîtrisées !';
+    document.getElementById('fc-a').textContent='';
+    document.getElementById('fc-prog').textContent=S.questions.length+'/'+S.questions.length+' maîtrisées';
+    return;
+  }
+  const q=rem[S.current%rem.length];
+  document.getElementById('fc-side').textContent='QUESTION';
+  document.getElementById('fc-q').textContent=q.t;
+  document.getElementById('fc-a').textContent=q.o[q.a];
+  document.getElementById('fc-el').classList.remove('flipped');
+  S.fcFlipped=false;
+  document.getElementById('prog-fill').style.width=(S.fcKnown.size/S.questions.length*100)+'%';
+  document.getElementById('prog-txt').textContent=S.fcKnown.size+' maîtrisées sur '+S.questions.length;
+  document.getElementById('fc-prog').textContent=S.fcKnown.size+'/'+S.questions.length+' maîtrisées · '+rem.length+' restantes';
+}
+function flipCard(){S.fcFlipped=!S.fcFlipped;document.getElementById('fc-el').classList.toggle('flipped');document.getElementById('fc-side').textContent=S.fcFlipped?'RÉPONSE':'QUESTION';}
+function fcAct(action){
+  const rem=S.questions.filter((_,i)=>!S.fcKnown.has(i));if(!rem.length)return;
+  const q=rem[S.current%rem.length];const oi=S.questions.indexOf(q);const key=getKey(q);
+  if(action==='know'){S.fcKnown.add(oi);updQSc(key,true);}else{updQSc(key,false);}
+  S.current++;renderFC();
+}
+
+// ════ FINISH & RESULTS ════
+function finishQuiz(){
+  clearInterval(S.timerInt);
+  const qs=S.questions;let ok=0,ko=0;
+  const res=qs.map(q=>{const key=getKey(q);const c=S.answers[key];const good=c===q.a;if(good)ok++;else ko++;return{q,c,good};});
+  const tot=qs.length,pct=Math.round(ok/tot*100);
+  const d=ld();if(!d.history)d.history=[];
+  const ml={exam:'Examen',memo:'Mémorisation',rapid:'Révision Express',errors:'Erreurs',flash:'Flashcard'};
+  const en=['EB1·P1','EB1·P2','EB1·P3','EB1 Complet','EB2·P1','EB2·P2','EB2·P3','EB2 Complet','Grand Final'];
+  d.history.unshift({date:new Date().toLocaleString('fr-FR'),mode:ml[S.mode]||S.mode,exam:en[S.examIdx]||'',pct,correct:ok,total:tot,time:S.elapsed});
+  if(d.history.length>80)d.history.pop();
+  if(S.mode==='exam'){if(!d.examScores)d.examScores={};d.examScores['e'+S.examIdx]=Math.max(d.examScores['e'+S.examIdx]||0,pct);}
+  sv(d);S.lastRes={res,ok,ko,tot,pct,el:S.elapsed};showResults(S.lastRes);
+}
+
+function showResults(r){
+  showScreen('results');
+  document.getElementById('res-score').textContent=r.pct+'%';
+  const en=['EB1 Partie 1','EB1 Partie 2','EB1 Partie 3','EB1 Complet','EB2 Partie 1','EB2 Partie 2','EB2 Partie 3','EB2 Complet','Grand Final'];
+  document.getElementById('res-name').textContent=en[S.examIdx]||'Session';
+  document.getElementById('res-ok').textContent=r.ok;
+  document.getElementById('res-ko').textContent=r.ko;
+  document.getElementById('res-total').textContent=r.tot;
+  document.getElementById('res-time').textContent=Math.floor(r.el/60)+':'+z(r.el%60);
+  const v=document.getElementById('res-verdict');
+  v.textContent=r.pct>=70?'✓ Admis — Score ≥ 70%':'✗ Non admis — Score < 70%';
+  v.className='results-verdict '+(r.pct>=70?'pass':'fail');
+  // Domain stats
+  const ds={};
+  r.res.forEach(({q,good})=>{
+    if(!ds[q.d])ds[q.d]={t:0,c:0};
+    ds[q.d].t++;if(good)ds[q.d].c++;
+  });
+  document.getElementById('domain-breakdown').innerHTML=Object.entries(ds).sort((a,b)=>b[1].c/b[1].t-a[1].c/a[1].t).map(([d,s])=>{
+    const p=Math.round(s.c/s.t*100);
+    const col=p>=70?'var(--green)':p>=50?'var(--yellow)':'var(--red)';
+    return`<div class="domain-row"><div class="domain-name">${d}</div><div class="domain-bar-bg"><div class="domain-bar-fg" style="width:${p}%;background:${col}"></div></div><div class="domain-pct" style="color:${col}">${p}%</div></div>`;
+  }).join('');
+  // Recommendations
+  const weak=Object.entries(ds).filter(([,s])=>s.c/s.t<0.7).map(([d])=>d);
+  const strong=Object.entries(ds).filter(([,s])=>s.c/s.t>=0.85).map(([d])=>d);
+  document.getElementById('reco-box').innerHTML=`<div class="rec-card">
+    <h3>${r.pct>=70?'🏆 Félicitations !':'🎯 Domaines à renforcer'}</h3>
+    <p>${r.pct>=70?'Score au-dessus du seuil PMP (70%). Continue à consolider tes points faibles.':'Score en dessous du seuil de 70%. Concentre-toi sur ces domaines :'}</p>
+    ${weak.length?`<div class="tags-row">${weak.map(d=>`<span class="tag-weak">❌ ${d}</span>`).join('')}</div>`:''}
+    ${strong.length?`<div class="tags-row" style="margin-top:8px">${strong.map(d=>`<span class="tag-strong">✓ ${d}</span>`).join('')}</div>`:''}
+  </div>`;
+  renderReview('wrong');
+}
+
+let activeTab='wrong';
+function switchTab(t){
+  activeTab=t;
+  document.getElementById('tab-wrong').classList.toggle('active',t==='wrong');
+  document.getElementById('tab-all').classList.toggle('active',t==='all');
+  renderReview(t);
+}
+function renderReview(tab){
+  if(!S.lastRes)return;
+  const items=tab==='wrong'?S.lastRes.res.filter(r=>!r.good):S.lastRes.res;
+  const L=['A','B','C','D'];
+  const bank=q=>Q.some(x=>x.id===q.id&&x.t===q.t)?'EB1':'EB2';
+  document.getElementById('review-box').innerHTML=items.length===0
+    ?'<div class="empty"><div class="empty-icon">🎉</div><div>Aucune erreur !</div></div>'
+    :items.map(({q,c,good})=>`
+      <div class="review-item ${good?'ri-right':'ri-wrong'}">
+        <div class="review-q">${good?'✅':'❌'} <strong>Q${q.id}</strong> <span style="background:var(--surface3);padding:1px 7px;border-radius:5px;font-size:.7rem">${bank(q)}</span> · <em style="color:var(--accent2)">${q.d}</em><br>${q.t.length>130?q.t.slice(0,130)+'…':q.t}</div>
+        <div class="review-ans">
+          <span class="clr-g">✓ ${L[q.a]}. ${q.o[q.a]}</span>
+          ${!good&&c!==undefined?`<br><span class="clr-r">✗ ${L[c]}. ${q.o[c]}</span>`:''}
+          ${q.e?`<br><span style="color:var(--text3)">💡 ${q.e.length>220?q.e.slice(0,220)+'…':q.e}</span>`:''}
+        </div>
+      </div>`).join('');
+}
+
+// ════ STATS ════
+function refreshStats(){
+  const d=ld(),h=d.history||[],sc=h.map(x=>x.pct);
+  const xp=h.length*10+Math.max(0,50-(d.errors||[]).length);
+  const lvs=[{n:'Débutant',i:'🔰',min:0,max:100},{n:'Intermédiaire',i:'📚',min:100,max:300},{n:'Avancé',i:'⭐',min:300,max:600},{n:'Ready PMP 🏆',i:'🎓',min:600,max:1000}];
+  const lv=lvs.slice().reverse().find(l=>xp>=l.min)||lvs[0];
+  const pg=Math.min(100,((xp-lv.min)/(lv.max-lv.min))*100);
+  document.getElementById('lv-icon').textContent=lv.i;
+  document.getElementById('lv-name').textContent=lv.n;
+  document.getElementById('lv-sub').textContent=xp+' XP accumulés';
+  document.getElementById('lv-xp').textContent=xp+' / '+lv.max+' XP';
+  document.getElementById('lv-fill').style.width=pg+'%';
+  document.getElementById('gs-total').textContent=h.length;
+  document.getElementById('gs-best').textContent=sc.length?Math.max(...sc)+'%':'—';
+  document.getElementById('gs-avg').textContent=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length)+'%':'—';
+  document.getElementById('gs-q').textContent=Object.keys(d.qSc||{}).length;
+  const hb=document.getElementById('history-box');
+  if(!h.length){hb.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div>Aucun historique.</div><div style="font-size:.8rem;margin-top:4px">Lance un examen pour commencer !</div></div>';return;}
+  hb.innerHTML=h.map(x=>`
+    <div class="history-item">
+      <div class="hi-date">📅 ${x.date}</div>
+      <div class="hi-mode">${x.mode}${x.exam?' · '+x.exam:''}</div>
+      <div class="hi-score ${x.pct>=70?'p':'f'}">${x.pct}%</div>
+      <div class="hi-detail">${x.correct}/${x.total} · ${Math.floor(x.time/60)}:${z(x.time%60)}</div>
+    </div>`).join('');
+}
+
+// ════ EXPORT ════
+function exportResults(){
+  if(!S.lastRes)return;
+  const r=S.lastRes,L=['A','B','C','D'];
+  const bank=q=>Q.some(x=>x.id===q.id&&x.t===q.t)?'EB1':'EB2';
+  const lines=[
+    'PMP SIMULATOR PRO — RAPPORT DE RÉSULTATS',
+    '==========================================',
+    `Date       : ${new Date().toLocaleString('fr-FR')}`,
+    `Examen     : ${['EB1-P1','EB1-P2','EB1-P3','EB1 Complet','EB2-P1','EB2-P2','EB2-P3','EB2 Complet','Grand Final'][S.examIdx]||''}`,
+    `Score      : ${r.pct}% (${r.ok}/${r.tot} bonnes réponses)`,
+    `Temps      : ${Math.floor(r.el/60)}:${z(r.el%60)}`,
+    `Verdict    : ${r.pct>=70?'✓ ADMIS (≥70%)':'✗ NON ADMIS (<70%)'}`,
+    '','=== DÉTAIL DES QUESTIONS ===','',
+    ...r.res.map(({q,c,good})=>`${bank(q)}-Q${q.id} [${q.d}] ${good?'✓':'✗'} | Bonne: ${L[q.a]} | Votre: ${c!==undefined?L[c]:'—'} | ${q.t.slice(0,70)}`)
+  ];
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='PMP_Resultats_'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+  URL.revokeObjectURL(url);toast('📄 Rapport exporté !');
+}
+
+// ════ HELPERS ════
+function shuf(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function toast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// ════ KEYBOARD ════
+document.addEventListener('keydown',e=>{
+  const sc=document.querySelector('.screen.active');if(!sc||sc.id!=='screen-quiz')return;
+  if(S.mode==='flash'){
+    if(e.key===' '){e.preventDefault();flipCard();}
+    if(e.key==='ArrowRight')fcAct('know');
+    if(e.key==='ArrowLeft')fcAct('review');
+  } else {
+    const map={a:0,b:1,c:2,d:3,'1':0,'2':1,'3':2,'4':3};
+    const k=e.key.toLowerCase();
+    if(map[k]!==undefined)selOpt(map[k]);
+    if(e.key==='Enter'||e.key==='ArrowRight'){const bn=document.getElementById('btn-next');if(bn&&!bn.disabled)nextQ();}
+    if(e.key==='ArrowLeft')prevQ();
+  }
+});
+
+// ════ INIT ════
+refreshHome();
+</script>
+</body>
+</html>
